@@ -157,11 +157,13 @@ function randomBarColor() {
 function createBarShape(name, width, height) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
-    var contents = shapeLayer.property("ADBE Root Vectors Group");
-    var rectPath = contents.addProperty("ADBE Vector Shape - Rect");
+    var rootContents = shapeLayer.property("ADBE Root Vectors Group");
+    var group = rootContents.addProperty("ADBE Vector Group");
+    var groupContents = group.property("ADBE Vectors Group");
+    var rectPath = groupContents.addProperty("ADBE Vector Shape - Rect");
     rectPath.property("ADBE Vector Rect Size").setValue([width, height]);
     rectPath.property("ADBE Vector Rect Position").setValue([width / 2, height / 2]);
-    contents.addProperty("ADBE Vector Graphic - Fill");
+    groupContents.addProperty("ADBE Vector Graphic - Fill");
     return shapeLayer;
 }
 
@@ -2012,7 +2014,7 @@ for (var x = 1; x <= totalBars; x++) {
     }
     
     //Bar Expressions (shape layer's own vector fill, driven by the Master Control's random color)
-    curItem.layer(3).property("ADBE Root Vectors Group").property("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Bar Color " + x + "\")(\"Color\")"
+    curItem.layer(3).property("ADBE Root Vectors Group").property("ADBE Vector Group").property("ADBE Vectors Group").property("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Bar Color " + x + "\")(\"Color\")"
     curItem.layer(3).scale.expression = "temp = ((((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") - " + minLine + ") * (100)) / (" + maxLine + " - " + minLine + "))  + 0); [100, temp]";
 }
 
@@ -4250,7 +4252,7 @@ for (var x = 1; x <= totalBars; x++) {
     curItem.layer(2).position.expression  = "temp = (((thisComp.width/100)*(((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") - " + minLine + ") * (100)) / (" + maxLine + " - " + minLine + "))  + 0))*-1; [((temp+(thisComp.width/2))-thisComp.height*.01)*-1+(thisComp.width*.004), thisComp.layer(\"Bar " + x +"\").transform.position[1] + (thisComp.height*" + textMoveMod +")]"
     
     //Bar Expressions (shape layer's own vector fill, driven by the Master Control's random color)
-    curItem.layer(3).property("ADBE Root Vectors Group").property("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Bar Color " + x + "\")(\"Color\")"
+    curItem.layer(3).property("ADBE Root Vectors Group").property("ADBE Vector Group").property("ADBE Vectors Group").property("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Bar Color " + x + "\")(\"Color\")"
     curItem.layer(3).scale.expression = "temp = (((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\"))- 0) - "+minLine+") * (100-0)/("+maxLine+" - "+minLine+");  [100, temp]";
     
 }
