@@ -1,143 +1,318 @@
-﻿{
-function myScript(thisObj) {
-          function myScript_buildUI(thisObj) {
-                    var myPanel = (thisObj instanceof Panel) ? thisObj : new Window("palette", "My Panel Name", [0, 0, 300, 300]);
- 
-                    res = "group{orientation:'row',\
-                        myPanelAlpha: Group{orientation:'column',\
-                            groupZero: Panel {orientation:'row', size: [276, 46], alignChildren:['center', 'center'] ,\
-                                    horizontalRadioButton: RadioButton{text:'Bars on X-Axis'},\
-                                    verticalRadioButton: RadioButton{text:'Bars on Y-Axis'},\
-                                    },\
-                            groupOne: Group{orientation:'column',\
-                                    initialTitle: StaticText{text:'Number of Bars'},\
-                                    myDropDownList: DropDownList{properties:{items:['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']} size: [276,20]},\
-                                    },\
-                           groupOneB: Panel {orientation:'column',\
-                                  minMaxTitle: StaticText {text:'Define your Min and Max for the Scale'},\
-                                  panelTwoA: Group{orientation:'row', size: [244, 46], alignChildren:['center', 'center'],\
-                                        minText: StaticText {text:'Min'},\
-                                        minField: EditText{text:'0', characters:5},\
-                                        maxText: StaticText {text:'Max'},\
-                                        maxField: EditText{text:'100', characters:5},\
-                                  },\
-                                  },\
-                            groupTwo: Group{orientation:'row',\
-                                    barCheckbox: Checkbox {text:'Bar Value Labels'},\
-                                    perCheckbox: Checkbox {text: '% Labels'},\
-                                    axisCheckbox: Checkbox {text:'Axis Labels'},\
-                                    },\
-                            groupDiv1: Group{orientation:'row' ,\
-                                    myDivPanelA:Panel{size:[276,2]},\
-                                    },\
-                            groupThree: Group{orientation:'row',\
-                                groupSubOne: Group {orientation:'row',\
-                                    myhorButton:Button{text:'Bar Graph', size: [140,20]},\
-                                    },\
-                                groupSubTwo: Group {orientation:'row',\
-                                    myQuestionButton:Button{text:'?', size:[30,20]},\
-                                    },\
-                          },\
-                     },\
-               }";
-          
-            myPanel.grp = myPanel.add(res);
-            
-            //PanelVar
-            var panelOver = myPanel.grp.myPanelAlpha;
-            var checkBoxVal = panelOver.groupTwo;
-            
-            // DropDownList default selection
-            panelOver.groupOne.myDropDownList.selection = 0; //Item index starts at 0
-            panelOver.groupZero.horizontalRadioButton.value = true;
-            
-            //Actions - GROUP 1
-            panelOver.groupThree.groupSubOne.myhorButton.onClick = function b1Auto() {
-                if(panelOver.groupZero.horizontalRadioButton.value == true) {
-                    if(checkBoxVal.perCheckbox.value == true && checkBoxVal.barCheckbox.value == false) {
-                           alert("You cannot have Percentage (%) Labels without Bar Value Labels. Please enable Bar Value Labels or disable Percentage (%) Labels.");
-                        } else {
-                                var curItem = app.project.activeItem;
-                                // check if comp is selected
-                                if (curItem == null || !(curItem instanceof CompItem)){
-                                    // if no comp selected, display an alert
-                                    alert("Please select a comp as the active item and try again.");
-                                } else{
-                                    horBarGraph(Number(panelOver.groupOne.myDropDownList.selection.text),Number(panelOver.groupOneB.panelTwoA.minField.text),Number(panelOver.groupOneB.panelTwoA.maxField.text),checkBoxVal.barCheckbox.value,checkBoxVal.perCheckbox.value,checkBoxVal.axisCheckbox.value);
-                                }
-                            }
-                        } 
-                if(panelOver.groupZero.verticalRadioButton.value == true) {
-                    if(checkBoxVal.perCheckbox.value == true && checkBoxVal.barCheckbox.value == false) {
-                           alert("You cannot have Percentage (%) Labels without Bar Value Labels. Please enable Bar Value Labels or disable Percentage (%) Labels.");
-                        } else {                    
-                          var curItem = app.project.activeItem;
-                                // check if comp is selected
-                                if (curItem == null || !(curItem instanceof CompItem)){
-                                    // if no comp selected, display an alert
-                                    alert("Please select a comp as the active item and try again.");
-                                } else{
-                                    vertBarGraph(Number(panelOver.groupOne.myDropDownList.selection.text),Number(panelOver.groupOneB.panelTwoA.minField.text),Number(panelOver.groupOneB.panelTwoA.maxField.text),checkBoxVal.barCheckbox.value,checkBoxVal.perCheckbox.value,checkBoxVal.axisCheckbox.value);
-                                }
-                    }
-                }
-            }
-        
-            //Help Button
-            panelOver.groupThree.groupSubTwo.myQuestionButton.onClick = function helpPanel() {
-                var g = new Window("dialog", "Simple Bar Help", undefined, {resizable:false});
-                var globalPanel = g.add("group");
-                globalPanel.orientation = "column";
-                    var helpPanel = globalPanel.add("panel");
-                        helpPanel.size = [380,380];
-                        helpPanel.alignChildren = "left";
-                        var ring1 = helpPanel.add("statictext", undefined ,"Bars on X-Axis or Y-Axis", {multiline: true});
-                        ring1.graphics.font = ScriptUI.newFont ("dialog", "Bold", 12);
-                        var ring2 = helpPanel.add("statictext", undefined ,"You have the option to run the bars across the X-Axis or down the side of the Y-Axis. All features work either way.", {multiline: true});
-                        ring2.preferredSize = [340,70];
-                        var divider1 = helpPanel.add("panel");
-                        divider1.size = [340,2];
-                        var ring3 = helpPanel.add("statictext", undefined ,"Slice Labels:", {multiline: true});
-                        ring3.graphics.font = ScriptUI.newFont ("dialog", "Bold", 12);
-                        var ring4 = helpPanel.add("statictext", undefined ,"Selecting this option will place the numerical values for each slice next their corresponding pie slice.", {multiline: true});
-                        ring4.preferredSize = [340,34];
-                        var ring5 = helpPanel.add("statictext", undefined ,"Include Key:", {multiline: true});
-                        ring5.graphics.font = ScriptUI.newFont ("dialog", "Bold", 12);
-                        var ring6 = helpPanel.add("statictext", undefined ,"Selecting this option will generate a key to the right of the graph.  An additional dialog box will prompt you to enter the label for each box in the key.", {multiline: true});
-                        ring6.preferredSize = [340,40];
-                    var ring7 = globalPanel.add("statictext", undefined, "Version .9 - Copyright 2017");
-               
-               //Close Button
-               var closeButton = g.add("button", undefined, "Close");
-                
-                closeButton.onClick = function() {
-                    g.close();
-                    }
-                
-                g.show();
-            } //End Help Panel Code
- 
-            //Setup panel sizing and make panel resizable
-            myPanel.layout.layout(true);
-            myPanel.grp.minimumSize = myPanel.grp.size;
-            myPanel.layout.resize();
-            myPanel.onResizing = myPanel.onResize = function () {this.layout.resize();}
+// Simple Bar //
 
-            return myPanel;
-          }
- 
- 
-          var myScriptPal = myScript_buildUI(thisObj);
- 
- 
-          if ((myScriptPal != null) && (myScriptPal instanceof Window)) {
-                    myScriptPal.center();
-                    myScriptPal.show();
-                    }
-          }
- 
- 
-          myScript(this);
+////// HELPERS ///////
+
+// Keeps a slider and its numeric edittext in sync, with clamping/NaN protection.
+function linkSliderAndEdit(slider, edit) {
+    slider.onChanging = function () {
+        edit.text = Math.round(slider.value);
+    };
+    edit.onChanging = function () {
+        var val = Math.round(Number(edit.text));
+        if (isNaN(val)) {
+            val = slider.value;
+        }
+        val = Math.min(slider.maxvalue, Math.max(slider.minvalue, val));
+        edit.text = val;
+        slider.value = val;
+    };
+}
+
+
+// SIMPLEBAR
+// =========
+var simpleBar = new Window("dialog");
+simpleBar.text = "Simple Bar";
+simpleBar.orientation = "column";
+simpleBar.alignChildren = ["center", "top"];
+simpleBar.spacing = 10;
+simpleBar.margins = 16;
+
+// PANEL1 - orientation
+// =====================
+var panel1 = simpleBar.add("panel", undefined, undefined, {name: "panel1"});
+panel1.preferredSize.width = 280;
+panel1.orientation = "row";
+panel1.alignChildren = ["center", "center"];
+panel1.spacing = 10;
+panel1.margins = 10;
+
+var horizontalRadioButton = panel1.add("radiobutton", undefined, "Bars on X-Axis");
+var verticalRadioButton = panel1.add("radiobutton", undefined, "Bars on Y-Axis");
+horizontalRadioButton.value = true;
+
+// PANEL2 - bar count
+// ====================
+var panel2 = simpleBar.add("panel", undefined, undefined, {name: "panel2"});
+panel2.preferredSize.width = 280;
+panel2.orientation = "column";
+panel2.alignChildren = ["left", "top"];
+panel2.spacing = 10;
+panel2.margins = 10;
+
+var group1 = panel2.add("group", undefined, {name: "group1"});
+group1.orientation = "row";
+group1.alignChildren = ["left", "center"];
+group1.spacing = 10;
+
+var statictext1 = group1.add("statictext", undefined, "Number of Bars:");
+var dropdown1_array = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+var dropdown1 = group1.add("dropdownlist", undefined, undefined, {name: "dropdown1", items: dropdown1_array});
+dropdown1.selection = 0;
+dropdown1.preferredSize.width = 106;
+
+// PANEL3 - min/max
+// ==================
+var panel3 = simpleBar.add("panel", undefined, undefined, {name: "panel3"});
+panel3.text = "Define your Min and Max for the Scale";
+panel3.preferredSize.width = 280;
+panel3.orientation = "row";
+panel3.alignChildren = ["center", "center"];
+panel3.spacing = 10;
+panel3.margins = 10;
+
+var minText = panel3.add("statictext", undefined, "Min");
+var minField = panel3.add("edittext", undefined, "0");
+minField.characters = 5;
+var maxText = panel3.add("statictext", undefined, "Max");
+var maxField = panel3.add("edittext", undefined, "100");
+maxField.characters = 5;
+
+// GROUP2 - checkboxes
+// =====================
+var group2 = simpleBar.add("group", undefined, {name: "group2"});
+group2.orientation = "row";
+group2.alignChildren = ["left", "center"];
+group2.spacing = 10;
+
+var barCheckbox = group2.add("checkbox", undefined, "Bar Value Labels");
+var perCheckbox = group2.add("checkbox", undefined, "% Labels");
+var axisCheckbox = group2.add("checkbox", undefined, "Axis Labels");
+
+// % Labels only make sense once Bar Value Labels is on - disable instead of
+// alerting after the fact.
+perCheckbox.enabled = false;
+barCheckbox.onClick = function () {
+    perCheckbox.enabled = barCheckbox.value;
+    if (!barCheckbox.value) {
+        perCheckbox.value = false;
+    }
+};
+
+// GROUP3 - buttons
+// ==================
+var group3 = simpleBar.add("group", undefined, {name: "group3"});
+group3.orientation = "row";
+group3.alignChildren = ["left", "center"];
+group3.spacing = 10;
+group3.margins = [0, 10, 0, 0];
+
+var button1 = group3.add("button", undefined, "Let's Go!");
+var button2 = group3.add("button", undefined, "Cancel");
+var button3 = group3.add("button", undefined, "?");
+button3.preferredSize.width = 30;
+
+button1.onClick = function () {
+    if (!(app.project.activeItem instanceof CompItem)) {
+        alert("Please select a comp as the active item and try again.");
+        return;
+    }
+
+    var isVertical = verticalRadioButton.value;
+    var totalBars = dropdown1.selection.index + 1;
+    var minVal = Number(minField.text);
+    var maxVal = Number(maxField.text);
+    var barCheck = barCheckbox.value;
+    var perCheck = perCheckbox.value;
+    var axisCheck = axisCheckbox.value;
+
+    secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axisCheck);
+    simpleBar.close();
+};
+
+button2.onClick = function () {
+    simpleBar.close();
+};
+
+button3.onClick = function () {
+    var g = new Window("dialog", "Simple Bar Help", undefined, {resizable: false});
+    var globalPanel = g.add("group");
+    globalPanel.orientation = "column";
+    var helpPanel = globalPanel.add("panel");
+    helpPanel.size = [380, 380];
+    helpPanel.alignChildren = "left";
+
+    var help1 = helpPanel.add("statictext", undefined, "Bars on X-Axis or Y-Axis", {multiline: true});
+    help1.graphics.font = ScriptUI.newFont("dialog", "Bold", 12);
+    var help2 = helpPanel.add("statictext", undefined, "You have the option to run the bars across the X-Axis or down the side of the Y-Axis. All features work either way.", {multiline: true});
+    help2.preferredSize = [340, 50];
+
+    var divider1 = helpPanel.add("panel");
+    divider1.size = [340, 2];
+
+    var help3 = helpPanel.add("statictext", undefined, "Bar Value Labels / % Labels:", {multiline: true});
+    help3.graphics.font = ScriptUI.newFont("dialog", "Bold", 12);
+    var help4 = helpPanel.add("statictext", undefined, "Selecting Bar Value Labels places the numeric value on top of each bar. % Labels additionally converts that value to a percentage of the min/max scale.", {multiline: true});
+    help4.preferredSize = [340, 50];
+
+    var help5 = helpPanel.add("statictext", undefined, "Axis Labels:", {multiline: true});
+    help5.graphics.font = ScriptUI.newFont("dialog", "Bold", 12);
+    var help6 = helpPanel.add("statictext", undefined, "Selecting this option lets you name each bar and adds min/max labels to the scale. You'll enter the names on the next screen.", {multiline: true});
+    help6.preferredSize = [340, 50];
+
+    var help7 = globalPanel.add("statictext", undefined, "Simple Bar");
+
+    var closeButton = g.add("button", undefined, "Close");
+    closeButton.onClick = function () {
+        g.close();
+    };
+
+    g.show();
+};
+
+simpleBar.show();
+
+
+// SIMPLEBAR_STEP2
+// ================
+function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axisCheck) {
+
+    var SimpleBar_Step2 = new Window("dialog");
+    SimpleBar_Step2.text = "Bar Graph Data";
+    SimpleBar_Step2.orientation = "column";
+    SimpleBar_Step2.alignChildren = ["center", "top"];
+    SimpleBar_Step2.spacing = 10;
+    SimpleBar_Step2.margins = 16;
+
+    // GROUP1
+    // ======
+    var group1 = SimpleBar_Step2.add("group", undefined, {name: "group1"});
+    group1.orientation = "row";
+    group1.alignChildren = ["left", "top"];
+    group1.spacing = 10;
+    group1.margins = 0;
+
+    // GROUP2 / GROUP13 - left/right panel columns
+    // =============================================
+    var group2 = group1.add("group", undefined, {name: "group2"});
+    group2.orientation = "column";
+    group2.alignChildren = ["left", "top"];
+    group2.spacing = 10;
+    group2.margins = 0;
+
+    var group13 = group1.add("group", undefined, {name: "group13"});
+    group13.orientation = "column";
+    group13.alignChildren = ["left", "top"];
+    group13.spacing = 10;
+    group13.margins = 0;
+
+    // BAR PANELS - one panel per bar, balanced across the two columns.
+    // Single column up to 6 bars, then split with the left column getting
+    // the larger half.
+    // ====================================================================
+    var sliders = [];
+    var labelEdits = [];
+    var defaultLabels = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var minMaxMiddle = (minVal + maxVal) / 2;
+
+    var leftColumnCount = (totalBars >= 7) ? Math.ceil(totalBars / 2) : totalBars;
+
+    for (var i = 1; i <= totalBars; i++) {
+        var targetGroup = (i <= leftColumnCount) ? group2 : group13;
+
+        var panel = targetGroup.add("panel", undefined, undefined, {name: "panel" + i});
+        panel.orientation = "column";
+        panel.alignChildren = ["left", "top"];
+        panel.spacing = 10;
+        panel.margins = 10;
+
+        if (axisCheck) {
+            var labelGroup = panel.add("group", undefined, {name: "labelGroup" + i});
+            labelGroup.orientation = "row";
+            labelGroup.alignChildren = ["left", "center"];
+            labelGroup.spacing = 10;
+            labelGroup.margins = 0;
+
+            var labelStatic = labelGroup.add("statictext", undefined, undefined, {name: "labelStatic" + i});
+            labelStatic.text = "Label " + i + ":";
+
+            var labelEdit = labelGroup.add('edittext {properties: {name: "labelEdit' + i + '"}}');
+            labelEdit.text = defaultLabels[i - 1] || ("Bar " + i);
+            labelEdit.preferredSize.width = 200;
+            labelEdits.push(labelEdit);
+
+            var labelDivider = panel.add("panel", undefined, undefined, {name: "labelDivider" + i});
+            labelDivider.alignment = "fill";
+        }
+
+        var valueGroup = panel.add("group", undefined, {name: "valueGroup" + i});
+        valueGroup.orientation = "row";
+        valueGroup.alignChildren = ["left", "center"];
+        valueGroup.spacing = 10;
+        valueGroup.margins = 0;
+
+        var valueStatic = valueGroup.add("statictext", undefined, undefined, {name: "valueStatic" + i});
+        valueStatic.text = "Value " + i + ":";
+
+        var slider = valueGroup.add("slider", undefined, undefined, undefined, undefined, {name: "slider" + i});
+        slider.minvalue = minVal;
+        slider.maxvalue = maxVal;
+        slider.value = minMaxMiddle;
+        slider.preferredSize.width = 200;
+        sliders.push(slider);
+
+        var valueEdit = valueGroup.add('edittext {justify: "center", properties: {name: "valueEdit' + i + '"}}');
+        valueEdit.text = Math.round(minMaxMiddle);
+        valueEdit.preferredSize.width = 40;
+
+        linkSliderAndEdit(slider, valueEdit);
+    }
+
+    // SIMPLEBAR_STEP2
+    // ================
+    var divider11 = SimpleBar_Step2.add("panel", undefined, undefined, {name: "divider11"});
+    divider11.alignment = "fill";
+
+    // GROUP24
+    // =======
+    var group24 = SimpleBar_Step2.add("group", undefined, {name: "group24"});
+    group24.orientation = "row";
+    group24.alignChildren = ["left", "center"];
+    group24.spacing = 10;
+    group24.margins = [0, 10, 0, 0];
+
+    var okButton = group24.add("button", undefined, undefined, {name: "okButton"});
+    okButton.text = "Ok!";
+    okButton.preferredSize.width = 71;
+
+    var cancelButton = group24.add("button", undefined, undefined, {name: "cancelButton"});
+    cancelButton.text = "Cancel";
+    cancelButton.preferredSize.width = 71;
+
+    okButton.onClick = function () {
+        var valuesArray = [];
+        var labelsArray = [];
+
+        for (var i = 0; i < sliders.length; i++) {
+            valuesArray.push(Math.round(sliders[i].value));
+            if (axisCheck) {
+                labelsArray.push(labelEdits[i].text);
+            }
+        }
+
+        if (isVertical) {
+            vertBarGraph(totalBars, minVal, maxVal, barCheck, perCheck, axisCheck, valuesArray, labelsArray);
+        } else {
+            horBarGraph(totalBars, minVal, maxVal, barCheck, perCheck, axisCheck, valuesArray, labelsArray);
+        }
+        SimpleBar_Step2.close();
+    };
+
+    cancelButton.onClick = function () {
+        SimpleBar_Step2.close();
+    };
+
+    SimpleBar_Step2.show();
 }
 
 
@@ -180,7 +355,7 @@ function createBarShape(curItem, name, width, height, colorIndex) {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //Horizontal Graph Maker
-function horBarGraph(pTotalBars, pMinText, pMaxText, pBarLabel, pPerLabel, pAxisLabel) {
+function horBarGraph(pTotalBars, pMinText, pMaxText, pBarLabel, pPerLabel, pAxisLabel, pValues, pLabels) {
 
 //Set Up
 var scriptName = "Horizontal Bar Graph";
@@ -190,36 +365,7 @@ var pxlAsp = curItem.pixelAspect;
 
 var checkEx;
 
-var cancelCheck = false;
-
-//Value Holding Amounts
-var master1 = 75;
-var master2 = 80;
-var master3 = 40;
-var master4 = 50;
-var master5 = 90;
-var master6 = 10;
-var master7 = 23;
-var master8 = 70;
-var master9 = 60;
-var master10 = 30;
-var master11 = 45;
-var master12 = 35;
-
 var totalBars = pTotalBars;
-
-var barLabel1 = "January";
-var barLabel2 = "February";
-var barLabel3 = "March";
-var barLabel4 = "April";
-var barLabel5 = "May";
-var barLabel6 = "June";
-var barLabel7 = "July";
-var barLabel8 = "August";
-var barLabel9 = "September";
-var barLabel10 = "October";
-var barLabel11 = "November";
-var barLabel12 = "December";
 
 //Determine Max and Min Amounts
 var maxLine = pMaxText;
@@ -231,1709 +377,8 @@ var perCheck = pPerLabel;
 var textCheck = pBarLabel;
 var labelCheck = pAxisLabel;
 
-/////////////////SECONDARY UI CONSTRUCTION//////////////
-//Initial UI Construction
-var masterUI = new Window("dialog");
-var headTitle = masterUI.add("statictext", undefined, "Bar Graph Data");
-
-var sliderPanel = masterUI.add("group");
-
-if (totalBars == 1) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    
-    sliderVal1.characters = 5;
-   
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars  == 2) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars  == 3) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars  == 4) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 5) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 6) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup1.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 7) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup1.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup1.add("group");
-    var subtitle7 = sliderPanelGroup1.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 8) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup2.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup2.add("group");
-    var subtitle6 = sliderPanelGroup2.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup2.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-    
-} else if (totalBars == 9) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup2.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup2.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-    var subtitle9 = sliderPanelGroup2.add("statictext", undefined, "Value 9");
-    var slider9Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider9= slider9Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider9.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    slider9.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    var sliderVal9 = slider9Group.add("edittext", undefined, slider9.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    sliderVal9.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-    slider9Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    slider9.onChanging = function() {var val9 = Math.round(slider9.value); sliderVal9.text = val9; }
-    sliderVal9.onChanging = function() {var val9 = Math.round(sliderVal9.text); slider9.value = val9; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            master9 = Math.round(slider9.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-
-    
-} else if (totalBars == 10) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup2.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup2.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-    var subtitle9 = sliderPanelGroup2.add("statictext", undefined, "Value 9");
-    var slider9Group = sliderPanelGroup2.add("group");
-    var subtitle10 = sliderPanelGroup2.add("statictext", undefined, "Value 10");
-    var slider10Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider9= slider9Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider10= slider10Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider9.value= minMaxMiddle;
-    slider10.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    slider9.size = "width: 200, height: 18";
-    slider10.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    var sliderVal9 = slider9Group.add("edittext", undefined, slider9.value);
-    var sliderVal10 = slider10Group.add("edittext", undefined, slider10.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    sliderVal9.characters = 5;
-    sliderVal10.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-    slider9Group.orientation = "row";
-    slider10Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    slider9.onChanging = function() {var val9 = Math.round(slider9.value); sliderVal9.text = val9; }
-    sliderVal9.onChanging = function() {var val9 = Math.round(sliderVal9.text); slider9.value = val9; }
-    slider10.onChanging = function() {var val10 = Math.round(slider10.value); sliderVal10.text = val10; }
-    sliderVal10.onChanging = function() {var val10 = Math.round(sliderVal10.text); slider10.value = val10; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            master9 = Math.round(slider9.value);
-            master10 = Math.round(slider10.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-
-} else if (totalBars == 11) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup1.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup1.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-    var subtitle9 = sliderPanelGroup2.add("statictext", undefined, "Value 9");
-    var slider9Group = sliderPanelGroup2.add("group");
-    var subtitle10 = sliderPanelGroup2.add("statictext", undefined, "Value 10");
-    var slider10Group = sliderPanelGroup2.add("group");
-    var subtitle11 = sliderPanelGroup2.add("statictext", undefined, "Value 11");
-    var slider11Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider9= slider9Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider10= slider10Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider11= slider11Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider9.value= minMaxMiddle;
-    slider10.value= minMaxMiddle;
-    slider11.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    slider9.size = "width: 200, height: 18";
-    slider10.size = "width: 200, height: 18";
-    slider11.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    var sliderVal9 = slider9Group.add("edittext", undefined, slider9.value);
-    var sliderVal10 = slider10Group.add("edittext", undefined, slider10.value);
-    var sliderVal11 = slider11Group.add("edittext", undefined, slider11.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    sliderVal9.characters = 5;
-    sliderVal10.characters = 5;
-    sliderVal11.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-    slider9Group.orientation = "row";
-    slider10Group.orientation = "row";
-    slider11Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    slider9.onChanging = function() {var val9 = Math.round(slider9.value); sliderVal9.text = val9; }
-    sliderVal9.onChanging = function() {var val9 = Math.round(sliderVal9.text); slider9.value = val9; }
-    slider10.onChanging = function() {var val10 = Math.round(slider10.value); sliderVal10.text = val10; }
-    sliderVal10.onChanging = function() {var val10 = Math.round(sliderVal10.text); slider10.value = val10; }
-    slider11.onChanging = function() {var val11 = Math.round(slider11.value); sliderVal11.text = val11; }
-    sliderVal11.onChanging = function() {var val11 = Math.round(sliderVal11.text); slider11.value = val11; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            master9 = Math.round(slider9.value);
-            master10 = Math.round(slider10.value);
-            master11 = Math.round(slider11.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 12) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup1.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup1.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-    var subtitle9 = sliderPanelGroup2.add("statictext", undefined, "Value 9");
-    var slider9Group = sliderPanelGroup2.add("group");
-    var subtitle10 = sliderPanelGroup2.add("statictext", undefined, "Value 10");
-    var slider10Group = sliderPanelGroup2.add("group");
-    var subtitle11 = sliderPanelGroup2.add("statictext", undefined, "Value 11");
-    var slider11Group = sliderPanelGroup2.add("group");
-    var subtitle12 = sliderPanelGroup2.add("statictext", undefined, "Value 12");
-    var slider12Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider9= slider9Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider10= slider10Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider11= slider11Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider12= slider12Group.add("slider", undefined, maxLine, minLine, maxLine);
-
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider9.value= minMaxMiddle;
-    slider10.value= minMaxMiddle;
-    slider11.value= minMaxMiddle;
-    slider12.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    slider9.size = "width: 200, height: 18";
-    slider10.size = "width: 200, height: 18";
-    slider11.size = "width: 200, height: 18";
-    slider12.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    var sliderVal9 = slider9Group.add("edittext", undefined, slider9.value);
-    var sliderVal10 = slider10Group.add("edittext", undefined, slider10.value);
-    var sliderVal11 = slider11Group.add("edittext", undefined, slider11.value);
-    var sliderVal12 = slider12Group.add("edittext", undefined, slider12.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    sliderVal9.characters = 5;
-    sliderVal10.characters = 5;
-    sliderVal11.characters = 5;
-    sliderVal12.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-    slider9Group.orientation = "row";
-    slider10Group.orientation = "row";
-    slider11Group.orientation = "row";
-    slider12Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    slider9.onChanging = function() {var val9 = Math.round(slider9.value); sliderVal9.text = val9; }
-    sliderVal9.onChanging = function() {var val9 = Math.round(sliderVal9.text); slider9.value = val9; }
-    slider10.onChanging = function() {var val10 = Math.round(slider10.value); sliderVal10.text = val10; }
-    sliderVal10.onChanging = function() {var val10 = Math.round(sliderVal10.text); slider10.value = val10; }
-    slider11.onChanging = function() {var val11 = Math.round(slider11.value); sliderVal11.text = val11; }
-    sliderVal11.onChanging = function() {var val11 = Math.round(sliderVal11.text); slider11.value = val11; }
-    slider12.onChanging = function() {var val12 = Math.round(slider12.value); sliderVal12.text = val12; }
-    sliderVal12.onChanging = function() {var val12 = Math.round(sliderVal12.text); slider12.value = val12; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            master9 = Math.round(slider9.value);
-            master10 = Math.round(slider10.value);
-            master11 = Math.round(slider11.value);
-            master12 = Math.round(slider12.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;  
-            masterUI.close();
-            }
-        
-     masterUI.show();
-}
-
-///////////LABEL UI////////////////////
-if (cancelCheck == false) {
-if (labelCheck == true) {
-    
-    //Label UI Construction
-    var labelUI = new Window("dialog");
-    var headTitle = labelUI.add("statictext", undefined, "Labels for Bars");
-    var labelMaster = labelUI.add("group");
-    labelMaster.alignChildren = "top";
-    var labelPanel = labelMaster.add("panel");
-    if (totalBars > 8) {
-        var labelPanel2 = labelMaster.add("panel");
-    }
-    
-    if (totalBars == 1) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-    } else if (totalBars == 2) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;
-   } else if (totalBars == 3) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30;           
-    } else if (totalBars == 4) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30; 
-    } else if (totalBars == 5) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 30;      
-    } else if (totalBars == 6) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 30; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 30; 
-    } else if (totalBars == 7) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 30; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 30;  
-        var labelGroup7 = labelPanel.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 30;    
-    } else if (totalBars == 8) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 30; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 30;  
-        var labelGroup7 = labelPanel.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 30;    
-        var labelGroup8 = labelPanel.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 30;    
-    } else if (totalBars == 9) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 18;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 18;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 18; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 18;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 18; 
-        var labelGroup6 = labelPanel2.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 18;  
-        var labelGroup7 = labelPanel2.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 18;    
-        var labelGroup8 = labelPanel2.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 18;  
-        var labelGroup9 = labelPanel2.add("group");
-        var labelStatic9 = labelGroup9.add("statictext", undefined, "Bar Label 9");
-        var labelEdit9 = labelGroup9.add("edittext", undefined, "");
-        labelEdit9.characters = 18;  
-    } else if (totalBars == 10) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 18;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 18;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 18; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 18;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 18; 
-        var labelGroup6 = labelPanel2.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 18;  
-        var labelGroup7 = labelPanel2.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 18;    
-        var labelGroup8 = labelPanel2.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 18;  
-        var labelGroup9 = labelPanel2.add("group");
-        var labelStatic9 = labelGroup9.add("statictext", undefined, "Bar Label 9");
-        var labelEdit9 = labelGroup9.add("edittext", undefined, "");
-        labelEdit9.characters = 18;  
-        var labelGroup10 = labelPanel2.add("group");
-        var labelStatic10 = labelGroup10.add("statictext", undefined, "Bar Label 10");
-        var labelEdit10 = labelGroup10.add("edittext", undefined, "");
-        labelEdit10.characters = 18;    
-    } else if (totalBars == 11) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 18;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 18;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 18; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 18;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 18; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 18;  
-        var labelGroup7 = labelPanel2.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 18;    
-        var labelGroup8 = labelPanel2.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 18;  
-        var labelGroup9 = labelPanel2.add("group");
-        var labelStatic9 = labelGroup9.add("statictext", undefined, "Bar Label 9");
-        var labelEdit9 = labelGroup9.add("edittext", undefined, "");
-        labelEdit9.characters = 18;  
-        var labelGroup10 = labelPanel2.add("group");
-        var labelStatic10 = labelGroup10.add("statictext", undefined, "Bar Label 10");
-        var labelEdit10 = labelGroup10.add("edittext", undefined, "");
-        labelEdit10.characters = 18;    
-        var labelGroup11 = labelPanel2.add("group");
-        var labelStatic11 = labelGroup11.add("statictext", undefined, "Bar Label 11");
-        var labelEdit11 = labelGroup11.add("edittext", undefined, "");
-        labelEdit11.characters = 18;    
-   } else if (totalBars == 12) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 18;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 18;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 18; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 18;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 18; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 18;  
-        var labelGroup7 = labelPanel2.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 18;    
-        var labelGroup8 = labelPanel2.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 18;  
-        var labelGroup9 = labelPanel2.add("group");
-        var labelStatic9 = labelGroup9.add("statictext", undefined, "Bar Label 9");
-        var labelEdit9 = labelGroup9.add("edittext", undefined, "");
-        labelEdit9.characters = 18;  
-        var labelGroup10 = labelPanel2.add("group");
-        var labelStatic10 = labelGroup10.add("statictext", undefined, "Bar Label 10");
-        var labelEdit10 = labelGroup10.add("edittext", undefined, "");
-        labelEdit10.characters = 18;    
-        var labelGroup11 = labelPanel2.add("group");
-        var labelStatic11 = labelGroup11.add("statictext", undefined, "Bar Label 11");
-        var labelEdit11 = labelGroup11.add("edittext", undefined, "");
-        labelEdit11.characters = 18;            
-        var labelGroup12 = labelPanel2.add("group");
-        var labelStatic12 = labelGroup12.add("statictext", undefined, "Bar Label 12");
-        var labelEdit12 = labelGroup12.add("edittext", undefined, "");
-        labelEdit12.characters = 18;            
-} 
-        
-    //Buttons
-    var initialButtonGroup = labelUI.add("group");
-    var labelAlrightButton = initialButtonGroup.add("button", undefined, "OK");
-    var labelCancelButton = initialButtonGroup.add("button", undefined, "Cancel");
-
-    initialButtonGroup.orientation = "row";
-    
-        //Set Text as defined in UI
-        labelAlrightButton.onClick = function() {
-            labelUI.close();
-            }
-        labelCancelButton.onClick = function() {
-            cancelCheck = true;
-            labelUI.close();
-            }
-    
-    labelUI.show();
-
-//Point Labels    
-if (totalBars == 1) {
-    var barLabel1 = labelEdit1.text;
-} else if (totalBars == 2) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-} else if (totalBars == 3) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-} else if (totalBars == 4) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-} else if (totalBars == 5) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-} else if (totalBars == 6) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-} else if (totalBars == 7) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-} else if (totalBars == 8) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-} else if (totalBars == 9) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-    var barLabel9 = labelEdit9.text;  
-} else if (totalBars == 10) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-    var barLabel9 = labelEdit9.text;  
-    var barLabel10 = labelEdit10.text;
-} else if (totalBars == 11) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-    var barLabel9 = labelEdit9.text;  
-    var barLabel10 = labelEdit10.text;
-    var barLabel11 = labelEdit11.text;
-} else if (totalBars == 12) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-    var barLabel9 = labelEdit9.text;  
-    var barLabel10 = labelEdit10.text;
-    var barLabel11 = labelEdit11.text;
-    var barLabel12 = labelEdit12.text;  
-    }   
-}
-}
 /////////////////CREATE MASTER CONTROL///////////////////
 
-if (cancelCheck == false) {
 
 //Start Undo Group
 app.beginUndoGroup(scriptName);
@@ -1947,34 +392,8 @@ for (var x = 1; x <= totalBars; x++) {
     curItem.selectedLayers[0].Effects.addProperty("Slider Control");
     curItem.selectedLayers[0].Effects.addProperty("Color Control");
     
-    var valueNumber;
+    var valueNumber = pValues[x - 1];
     var colorCont = randomBarColor();
-
-    if (x == 1) {
-        var valueNumber = master1;
-    } else if (x == 2) {
-        var valueNumber = master2;
-    } else if (x == 3) {
-        var valueNumber = master3;
-    } else if (x == 4) {
-        var valueNumber = master4;
-    } else if (x == 5) {
-        var valueNumber = master5;
-    } else if (x == 6) {
-        var valueNumber = master6;
-    } else if (x == 7) {
-        var valueNumber = master7;
-    } else if (x == 8) {
-        var valueNumber = master8;
-    } else if (x == 9) {
-        var valueNumber = master9;
-    } else if (x == 10) {
-        var valueNumber = master10;
-    } else if (x == 11) {
-       var valueNumber = master11;
-    } else if (x == 12) {
-       var valueNumber = master12;
-    }
 
     //Slider Control
     curItem.selectedLayers[0].property("Effects").property("Slider Control").property("Slider").setValueAtTime(.8+((x-1)/2),minLine);
@@ -2138,31 +557,7 @@ if (labelCheck == true) {
         for (x = 1; x <= totalBars; x++) {
             
                 //Label
-                if (x == 1) {
-                    var label = barLabel1;
-                    } else if (x == 2) {
-                    var label = barLabel2;
-                    } else if (x == 3) {
-                    var label = barLabel3;
-                    } else if (x == 4) {
-                    var label = barLabel4;
-                    } else if (x == 5) {
-                    var label = barLabel5;
-                    } else if (x == 6) {
-                    var label = barLabel6;
-                    } else if (x == 7) {
-                    var label = barLabel7;
-                    } else if (x == 8) {
-                    var label = barLabel8;
-                    } else if (x == 9) {
-                    var label = barLabel9;
-                    } else if (x == 10) {
-                    var label = barLabel10;
-                    } else if (x == 11) {
-                    var label = barLabel11;
-                    } else if (x == 12) {
-                    var label = barLabel12;
-                    }
+                var label = pLabels[x - 1];
                 
                 //Main Text Layer
                 curItem.layers.addText(label);  
@@ -2325,7 +720,6 @@ app.project.activeItem.time = timeSetTo;
 //End Undo Group
 app.endUndoGroup();
 
-} //Cancel Check Wrapping
 
 //**********************************************************//
 //////////////////FUNCTIONS/////////////////////////
@@ -2417,7 +811,7 @@ function vBarMaker(spacingAmount) {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //Vertical Graph Maker
-function vertBarGraph(pTotalBars, pMinText, pMaxText, pBarLabel, pPerLabel, pAxisLabel) {
+function vertBarGraph(pTotalBars, pMinText, pMaxText, pBarLabel, pPerLabel, pAxisLabel, pValues, pLabels) {
 
 //Set Up
 var scriptName = "Vertical Bar Graph";  
@@ -2427,36 +821,7 @@ var pxlAsp = curItem.pixelAspect;
 
 var checkEx;
 
-var cancelCheck = false;
-
-//Value Holding Amounts
-var master1 = 75;
-var master2 = 80;
-var master3 = 40;
-var master4 = 50;
-var master5 = 90;
-var master6 = 10;
-var master7 = 23;
-var master8 = 70;
-var master9 = 60;
-var master10 = 30;
-var master11 = 45;
-var master12 = 35;
-
 var totalBars = pTotalBars;
-
-var barLabel1 = "January";
-var barLabel2 = "February";
-var barLabel3 = "March";
-var barLabel4 = "April";
-var barLabel5 = "May";
-var barLabel6 = "June";
-var barLabel7 = "July";
-var barLabel8 = "August";
-var barLabel9 = "September";
-var barLabel10 = "October";
-var barLabel11 = "November";
-var barLabel12 = "December";
 
 //Determine Max and Min Amounts
 var maxLine = pMaxText;
@@ -2468,1709 +833,8 @@ var perCheck = pPerLabel;
 var textCheck = pBarLabel;
 var labelCheck = pAxisLabel;
 
-/////////////////SECONDARY UI CONSTRUCTION//////////////
-//Initial UI Construction
-var masterUI = new Window("dialog");
-var headTitle = masterUI.add("statictext", undefined, "Bar Graph Data");
-
-var sliderPanel = masterUI.add("group");
-
-if (totalBars == 1) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    
-    sliderVal1.characters = 5;
-   
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars  == 2) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars  == 3) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars  == 4) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 5) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 6) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup1.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 7) {
-    var sliderPanelGroup1 = sliderPanel.add("panel");
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup1.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup1.add("group");
-    var subtitle7 = sliderPanelGroup1.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup1.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    
-    sliderPanelGroup1.orientation = "column";
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 8) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup2.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup2.add("group");
-    var subtitle6 = sliderPanelGroup2.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup2.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-    
-} else if (totalBars == 9) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup2.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup2.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-    var subtitle9 = sliderPanelGroup2.add("statictext", undefined, "Value 9");
-    var slider9Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider9= slider9Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider9.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    slider9.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    var sliderVal9 = slider9Group.add("edittext", undefined, slider9.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    sliderVal9.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-    slider9Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    slider9.onChanging = function() {var val9 = Math.round(slider9.value); sliderVal9.text = val9; }
-    sliderVal9.onChanging = function() {var val9 = Math.round(sliderVal9.text); slider9.value = val9; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            master9 = Math.round(slider9.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-
-    
-} else if (totalBars == 10) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup2.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup2.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-    var subtitle9 = sliderPanelGroup2.add("statictext", undefined, "Value 9");
-    var slider9Group = sliderPanelGroup2.add("group");
-    var subtitle10 = sliderPanelGroup2.add("statictext", undefined, "Value 10");
-    var slider10Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider9= slider9Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider10= slider10Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider9.value= minMaxMiddle;
-    slider10.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    slider9.size = "width: 200, height: 18";
-    slider10.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    var sliderVal9 = slider9Group.add("edittext", undefined, slider9.value);
-    var sliderVal10 = slider10Group.add("edittext", undefined, slider10.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    sliderVal9.characters = 5;
-    sliderVal10.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-    slider9Group.orientation = "row";
-    slider10Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    slider9.onChanging = function() {var val9 = Math.round(slider9.value); sliderVal9.text = val9; }
-    sliderVal9.onChanging = function() {var val9 = Math.round(sliderVal9.text); slider9.value = val9; }
-    slider10.onChanging = function() {var val10 = Math.round(slider10.value); sliderVal10.text = val10; }
-    sliderVal10.onChanging = function() {var val10 = Math.round(sliderVal10.text); slider10.value = val10; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            master9 = Math.round(slider9.value);
-            master10 = Math.round(slider10.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-
-} else if (totalBars == 11) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup1.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup1.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-    var subtitle9 = sliderPanelGroup2.add("statictext", undefined, "Value 9");
-    var slider9Group = sliderPanelGroup2.add("group");
-    var subtitle10 = sliderPanelGroup2.add("statictext", undefined, "Value 10");
-    var slider10Group = sliderPanelGroup2.add("group");
-    var subtitle11 = sliderPanelGroup2.add("statictext", undefined, "Value 11");
-    var slider11Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider9= slider9Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider10= slider10Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider11= slider11Group.add("slider", undefined, maxLine, minLine, maxLine);
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider9.value= minMaxMiddle;
-    slider10.value= minMaxMiddle;
-    slider11.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    slider9.size = "width: 200, height: 18";
-    slider10.size = "width: 200, height: 18";
-    slider11.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    var sliderVal9 = slider9Group.add("edittext", undefined, slider9.value);
-    var sliderVal10 = slider10Group.add("edittext", undefined, slider10.value);
-    var sliderVal11 = slider11Group.add("edittext", undefined, slider11.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    sliderVal9.characters = 5;
-    sliderVal10.characters = 5;
-    sliderVal11.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-    slider9Group.orientation = "row";
-    slider10Group.orientation = "row";
-    slider11Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    slider9.onChanging = function() {var val9 = Math.round(slider9.value); sliderVal9.text = val9; }
-    sliderVal9.onChanging = function() {var val9 = Math.round(sliderVal9.text); slider9.value = val9; }
-    slider10.onChanging = function() {var val10 = Math.round(slider10.value); sliderVal10.text = val10; }
-    sliderVal10.onChanging = function() {var val10 = Math.round(sliderVal10.text); slider10.value = val10; }
-    slider11.onChanging = function() {var val11 = Math.round(slider11.value); sliderVal11.text = val11; }
-    sliderVal11.onChanging = function() {var val11 = Math.round(sliderVal11.text); slider11.value = val11; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            master9 = Math.round(slider9.value);
-            master10 = Math.round(slider10.value);
-            master11 = Math.round(slider11.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;      
-            masterUI.close();
-            }
-        
-     masterUI.show();
-} else if (totalBars == 12) {
-    var dualGroup  = sliderPanel.add("group"); 
-    dualGroup.alignChildren = "top";
-    
-    var sliderPanelGroup1 = dualGroup.add("panel");
-    var sliderPanelGroup2 = dualGroup.add("panel");
-    
-    var subtitle1 = sliderPanelGroup1.add("statictext", undefined, "Value 1");
-    var slider1Group = sliderPanelGroup1.add("group");
-    var subtitle2 = sliderPanelGroup1.add("statictext", undefined, "Value 2");
-    var slider2Group = sliderPanelGroup1.add("group");
-    var subtitle3 = sliderPanelGroup1.add("statictext", undefined, "Value 3");
-    var slider3Group = sliderPanelGroup1.add("group");
-    var subtitle4 = sliderPanelGroup1.add("statictext", undefined, "Value 4");
-    var slider4Group = sliderPanelGroup1.add("group");
-    var subtitle5 = sliderPanelGroup1.add("statictext", undefined, "Value 5");
-    var slider5Group = sliderPanelGroup1.add("group");
-    var subtitle6 = sliderPanelGroup1.add("statictext", undefined, "Value 6");
-    var slider6Group = sliderPanelGroup1.add("group");
-    var subtitle7 = sliderPanelGroup2.add("statictext", undefined, "Value 7");
-    var slider7Group = sliderPanelGroup2.add("group");
-    var subtitle8 = sliderPanelGroup2.add("statictext", undefined, "Value 8");
-    var slider8Group = sliderPanelGroup2.add("group");
-    var subtitle9 = sliderPanelGroup2.add("statictext", undefined, "Value 9");
-    var slider9Group = sliderPanelGroup2.add("group");
-    var subtitle10 = sliderPanelGroup2.add("statictext", undefined, "Value 10");
-    var slider10Group = sliderPanelGroup2.add("group");
-    var subtitle11 = sliderPanelGroup2.add("statictext", undefined, "Value 11");
-    var slider11Group = sliderPanelGroup2.add("group");
-    var subtitle12 = sliderPanelGroup2.add("statictext", undefined, "Value 12");
-    var slider12Group = sliderPanelGroup2.add("group");
-
-    var slider1= slider1Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider2= slider2Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider3= slider3Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider4= slider4Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider5= slider5Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider6= slider6Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider7= slider7Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider8= slider8Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider9= slider9Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider10= slider10Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider11= slider11Group.add("slider", undefined, maxLine, minLine, maxLine);
-    var slider12= slider12Group.add("slider", undefined, maxLine, minLine, maxLine);
-
-    
-    slider1.value= minMaxMiddle;
-    slider2.value= minMaxMiddle;
-    slider3.value= minMaxMiddle;
-    slider4.value= minMaxMiddle;
-    slider5.value= minMaxMiddle;
-    slider6.value= minMaxMiddle;
-    slider7.value= minMaxMiddle;
-    slider8.value= minMaxMiddle;
-    slider9.value= minMaxMiddle;
-    slider10.value= minMaxMiddle;
-    slider11.value= minMaxMiddle;
-    slider12.value= minMaxMiddle;
-    slider1.size = "width: 200, height: 18";
-    slider2.size = "width: 200, height: 18";
-    slider3.size = "width: 200, height: 18";
-    slider4.size = "width: 200, height: 18";
-    slider5.size = "width: 200, height: 18";
-    slider6.size = "width: 200, height: 18";
-    slider7.size = "width: 200, height: 18";
-    slider8.size = "width: 200, height: 18";
-    slider9.size = "width: 200, height: 18";
-    slider10.size = "width: 200, height: 18";
-    slider11.size = "width: 200, height: 18";
-    slider12.size = "width: 200, height: 18";
-    
-    var sliderVal1 = slider1Group.add("edittext", undefined, slider1.value);
-    var sliderVal2 = slider2Group.add("edittext", undefined, slider2.value);
-    var sliderVal3 = slider3Group.add("edittext", undefined, slider3.value);
-    var sliderVal4 = slider4Group.add("edittext", undefined, slider4.value);
-    var sliderVal5 = slider5Group.add("edittext", undefined, slider5.value);
-    var sliderVal6 = slider6Group.add("edittext", undefined, slider6.value);
-    var sliderVal7 = slider7Group.add("edittext", undefined, slider7.value);
-    var sliderVal8 = slider8Group.add("edittext", undefined, slider8.value);
-    var sliderVal9 = slider9Group.add("edittext", undefined, slider9.value);
-    var sliderVal10 = slider10Group.add("edittext", undefined, slider10.value);
-    var sliderVal11 = slider11Group.add("edittext", undefined, slider11.value);
-    var sliderVal12 = slider12Group.add("edittext", undefined, slider12.value);
-    
-    sliderVal1.characters = 5;
-    sliderVal2.characters = 5;
-    sliderVal3.characters = 5;
-    sliderVal4.characters = 5;
-    sliderVal5.characters = 5;
-    sliderVal6.characters = 5;
-    sliderVal7.characters = 5;
-    sliderVal8.characters = 5;
-    sliderVal9.characters = 5;
-    sliderVal10.characters = 5;
-    sliderVal11.characters = 5;
-    sliderVal12.characters = 5;
-    
-    dualGroup.orientation = "row";
-    sliderPanelGroup1.orientation = "column";
-    sliderPanelGroup2.orientation = "column";
-    
-    slider1Group.orientation = "row";
-    slider2Group.orientation = "row";
-    slider3Group.orientation = "row";
-    slider4Group.orientation = "row";
-    slider5Group.orientation = "row";
-    slider6Group.orientation = "row";
-    slider7Group.orientation = "row";
-    slider8Group.orientation = "row";
-    slider9Group.orientation = "row";
-    slider10Group.orientation = "row";
-    slider11Group.orientation = "row";
-    slider12Group.orientation = "row";
-   
-    slider1.onChanging = function() {var val1 = Math.round(slider1.value); sliderVal1.text = val1; }
-    sliderVal1.onChanging = function() {var val1 = Math.round(sliderVal1.text); slider1.value = val1; }
-    slider2.onChanging = function() {var val2 = Math.round(slider2.value); sliderVal2.text = val2; }    
-    sliderVal2.onChanging = function() {var val2 = Math.round(sliderVal2.text); slider2.value = val2; }
-    slider3.onChanging = function() {var val3 = Math.round(slider3.value); sliderVal3.text = val3; }
-    sliderVal3.onChanging = function() {var val3 = Math.round(sliderVal3.text); slider3.value = val3; }
-    slider4.onChanging = function() {var val4 = Math.round(slider4.value); sliderVal4.text = val4; }
-    sliderVal4.onChanging = function() {var val4 = Math.round(sliderVal4.text); slider4.value = val4; }
-    slider5.onChanging = function() {var val5 = Math.round(slider5.value); sliderVal5.text = val5; }
-    sliderVal5.onChanging = function() {var val5 = Math.round(sliderVal5.text); slider5.value = val5; }
-    slider6.onChanging = function() {var val6 = Math.round(slider6.value); sliderVal6.text = val6; }
-    sliderVal6.onChanging = function() {var val6 = Math.round(sliderVal6.text); slider6.value = val6; }
-    slider7.onChanging = function() {var val7 = Math.round(slider7.value); sliderVal7.text = val7; }
-    sliderVal7.onChanging = function() {var val7 = Math.round(sliderVal7.text); slider7.value = val7; }
-    slider8.onChanging = function() {var val8 = Math.round(slider8.value); sliderVal8.text = val8; }
-    sliderVal8.onChanging = function() {var val8 = Math.round(sliderVal8.text); slider8.value = val8; }
-    slider9.onChanging = function() {var val9 = Math.round(slider9.value); sliderVal9.text = val9; }
-    sliderVal9.onChanging = function() {var val9 = Math.round(sliderVal9.text); slider9.value = val9; }
-    slider10.onChanging = function() {var val10 = Math.round(slider10.value); sliderVal10.text = val10; }
-    sliderVal10.onChanging = function() {var val10 = Math.round(sliderVal10.text); slider10.value = val10; }
-    slider11.onChanging = function() {var val11 = Math.round(slider11.value); sliderVal11.text = val11; }
-    sliderVal11.onChanging = function() {var val11 = Math.round(sliderVal11.text); slider11.value = val11; }
-    slider12.onChanging = function() {var val12 = Math.round(slider12.value); sliderVal12.text = val12; }
-    sliderVal12.onChanging = function() {var val12 = Math.round(sliderVal12.text); slider12.value = val12; }
-    
-    sliderPanel.orientation = "row";
-    
-    //Buttons
-    var buttonGroup = masterUI.add("group");
-    var alrightButton = buttonGroup.add("button", undefined, "OK");
-    var cancelButton = buttonGroup.add("button", undefined, "Cancel");
-    buttonGroup.orientation = "row";
-    
-    //Set Text as defined in UI
-    alrightButton.onClick = function() {
-            master1 = Math.round(slider1.value);
-            master2 = Math.round(slider2.value);
-            master3 = Math.round(slider3.value);
-            master4 = Math.round(slider4.value);            
-            master5 = Math.round(slider5.value);                
-            master6 = Math.round(slider6.value);            
-            master7 = Math.round(slider7.value);
-            master8 = Math.round(slider8.value);
-            master9 = Math.round(slider9.value);
-            master10 = Math.round(slider10.value);
-            master11 = Math.round(slider11.value);
-            master12 = Math.round(slider12.value);
-            masterUI.close();
-            }
-     cancelButton.onClick = function() {
-            cancelCheck = true;  
-            masterUI.close();
-            }
-        
-     masterUI.show();
-}
-
-///////////LABEL UI////////////////////
-if (cancelCheck == false) {
-if (labelCheck == true) {
-    
-    //Label UI Construction
-    var labelUI = new Window("dialog");
-    var headTitle = labelUI.add("statictext", undefined, "Labels for Points");
-    var labelMaster = labelUI.add("group");
-    labelMaster.alignChildren = "top";
-    var labelPanel = labelMaster.add("panel");
-    if (totalBars > 8) {
-        var labelPanel2 = labelMaster.add("panel");
-    }
-    
-    if (totalBars == 1) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-    } else if (totalBars == 2) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;
-   } else if (totalBars == 3) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30;           
-    } else if (totalBars == 4) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30; 
-    } else if (totalBars == 5) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 30;      
-    } else if (totalBars == 6) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 30; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 30; 
-    } else if (totalBars == 7) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 30; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 30;  
-        var labelGroup7 = labelPanel.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 30;    
-    } else if (totalBars == 8) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 30;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 30;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 30; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 30;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 30; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 30;  
-        var labelGroup7 = labelPanel.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 30;    
-        var labelGroup8 = labelPanel.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 30;    
-    } else if (totalBars == 9) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 18;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 18;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 18; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 18;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 18; 
-        var labelGroup6 = labelPanel2.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 18;  
-        var labelGroup7 = labelPanel2.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 18;    
-        var labelGroup8 = labelPanel2.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 18;  
-        var labelGroup9 = labelPanel2.add("group");
-        var labelStatic9 = labelGroup9.add("statictext", undefined, "Bar Label 9");
-        var labelEdit9 = labelGroup9.add("edittext", undefined, "");
-        labelEdit9.characters = 18;  
-    } else if (totalBars == 10) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 18;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 18;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 18; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 18;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 18; 
-        var labelGroup6 = labelPanel2.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 18;  
-        var labelGroup7 = labelPanel2.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 18;    
-        var labelGroup8 = labelPanel2.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 18;  
-        var labelGroup9 = labelPanel2.add("group");
-        var labelStatic9 = labelGroup9.add("statictext", undefined, "Bar Label 9");
-        var labelEdit9 = labelGroup9.add("edittext", undefined, "");
-        labelEdit9.characters = 18;  
-        var labelGroup10 = labelPanel2.add("group");
-        var labelStatic10 = labelGroup10.add("statictext", undefined, "Bar Label 10");
-        var labelEdit10 = labelGroup10.add("edittext", undefined, "");
-        labelEdit10.characters = 18;    
-    } else if (totalBars == 11) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 18;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 18;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 18; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 18;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 18; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 18;  
-        var labelGroup7 = labelPanel2.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 18;    
-        var labelGroup8 = labelPanel2.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 18;  
-        var labelGroup9 = labelPanel2.add("group");
-        var labelStatic9 = labelGroup9.add("statictext", undefined, "Bar Label 9");
-        var labelEdit9 = labelGroup9.add("edittext", undefined, "");
-        labelEdit9.characters = 18;  
-        var labelGroup10 = labelPanel2.add("group");
-        var labelStatic10 = labelGroup10.add("statictext", undefined, "Bar Label 10");
-        var labelEdit10 = labelGroup10.add("edittext", undefined, "");
-        labelEdit10.characters = 18;    
-        var labelGroup11 = labelPanel2.add("group");
-        var labelStatic11 = labelGroup11.add("statictext", undefined, "Bar Label 11");
-        var labelEdit11 = labelGroup11.add("edittext", undefined, "");
-        labelEdit11.characters = 18;    
-   } else if (totalBars == 12) {
-        var labelGroup1 = labelPanel.add("group");
-        var labelStatic1 = labelGroup1.add("statictext", undefined, "Bar Label 1");
-        var labelEdit1 = labelGroup1.add("edittext", undefined, "");
-        labelEdit1.characters = 18;
-        var labelGroup2 = labelPanel.add("group");
-        var labelStatic2 = labelGroup2.add("statictext", undefined, "Bar Label 2");
-        var labelEdit2 = labelGroup2.add("edittext", undefined, "");
-        labelEdit2.characters = 18;       
-        var labelGroup3 = labelPanel.add("group");
-        var labelStatic3 = labelGroup3.add("statictext", undefined, "Bar Label 3");
-        var labelEdit3 = labelGroup3.add("edittext", undefined, "");
-        labelEdit3.characters = 18; 
-        var labelGroup4 = labelPanel.add("group");
-        var labelStatic4 = labelGroup4.add("statictext", undefined, "Bar Label 4");
-        var labelEdit4 = labelGroup4.add("edittext", undefined, "");
-        labelEdit4.characters = 18;         
-        var labelGroup5 = labelPanel.add("group");
-        var labelStatic5 = labelGroup5.add("statictext", undefined, "Bar Label 5");
-        var labelEdit5 = labelGroup5.add("edittext", undefined, "");
-        labelEdit5.characters = 18; 
-        var labelGroup6 = labelPanel.add("group");
-        var labelStatic6 = labelGroup6.add("statictext", undefined, "Bar Label 6");
-        var labelEdit6 = labelGroup6.add("edittext", undefined, "");
-        labelEdit6.characters = 18;  
-        var labelGroup7 = labelPanel2.add("group");
-        var labelStatic7 = labelGroup7.add("statictext", undefined, "Bar Label 7");
-        var labelEdit7 = labelGroup7.add("edittext", undefined, "");
-        labelEdit7.characters = 18;    
-        var labelGroup8 = labelPanel2.add("group");
-        var labelStatic8 = labelGroup8.add("statictext", undefined, "Bar Label 8");
-        var labelEdit8 = labelGroup8.add("edittext", undefined, "");
-        labelEdit8.characters = 18;  
-        var labelGroup9 = labelPanel2.add("group");
-        var labelStatic9 = labelGroup9.add("statictext", undefined, "Bar Label 9");
-        var labelEdit9 = labelGroup9.add("edittext", undefined, "");
-        labelEdit9.characters = 18;  
-        var labelGroup10 = labelPanel2.add("group");
-        var labelStatic10 = labelGroup10.add("statictext", undefined, "Bar Label 10");
-        var labelEdit10 = labelGroup10.add("edittext", undefined, "");
-        labelEdit10.characters = 18;    
-        var labelGroup11 = labelPanel2.add("group");
-        var labelStatic11 = labelGroup11.add("statictext", undefined, "Bar Label 11");
-        var labelEdit11 = labelGroup11.add("edittext", undefined, "");
-        labelEdit11.characters = 18;            
-        var labelGroup12 = labelPanel2.add("group");
-        var labelStatic12 = labelGroup12.add("statictext", undefined, "Bar Label 12");
-        var labelEdit12 = labelGroup12.add("edittext", undefined, "");
-        labelEdit12.characters = 18;            
-} 
-        
-    //Buttons
-    var initialButtonGroup = labelUI.add("group");
-    var labelAlrightButton = initialButtonGroup.add("button", undefined, "OK");
-    var labelCancelButton = initialButtonGroup.add("button", undefined, "Cancel");
-
-    initialButtonGroup.orientation = "row";
-    
-        //Set Text as defined in UI
-        labelAlrightButton.onClick = function() {
-            labelUI.close();
-            }
-        labelCancelButton.onClick = function() {
-            cancelCheck = true;
-            labelUI.close();
-            }
-    
-    labelUI.show();
-
-//Point Labels    
-if (totalBars == 1) {
-    var barLabel1 = labelEdit1.text;
-} else if (totalBars == 2) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-} else if (totalBars == 3) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-} else if (totalBars == 4) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-} else if (totalBars == 5) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-} else if (totalBars == 6) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-} else if (totalBars == 7) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-} else if (totalBars == 8) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-} else if (totalBars == 9) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-    var barLabel9 = labelEdit9.text;  
-} else if (totalBars == 10) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-    var barLabel9 = labelEdit9.text;  
-    var barLabel10 = labelEdit10.text;
-} else if (totalBars == 11) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-    var barLabel9 = labelEdit9.text;  
-    var barLabel10 = labelEdit10.text;
-    var barLabel11 = labelEdit11.text;
-} else if (totalBars == 12) {
-    var barLabel1 = labelEdit1.text;
-    var barLabel2 = labelEdit2.text;
-    var barLabel3 = labelEdit3.text;  
-    var barLabel4 = labelEdit4.text;
-    var barLabel5 = labelEdit5.text;
-    var barLabel6 = labelEdit6.text;  
-    var barLabel7 = labelEdit7.text;
-    var barLabel8 = labelEdit8.text;
-    var barLabel9 = labelEdit9.text;  
-    var barLabel10 = labelEdit10.text;
-    var barLabel11 = labelEdit11.text;
-    var barLabel12 = labelEdit12.text;  
-    }   
-}
-}
 /////////////////CREATE MASTER CONTROL///////////////////
 
-if (cancelCheck == false) {
 
 //Start Undo Group
 app.beginUndoGroup(scriptName);
@@ -4184,34 +848,8 @@ for (var x = 1; x <= totalBars; x++) {
     curItem.selectedLayers[0].Effects.addProperty("Slider Control");
     curItem.selectedLayers[0].Effects.addProperty("Color Control");
     
-    var valueNumber;
+    var valueNumber = pValues[x - 1];
     var colorCont = randomBarColor();
-
-    if (x == 1) {
-        var valueNumber = master1;
-    } else if (x == 2) {
-        var valueNumber = master2;
-    } else if (x == 3) {
-        var valueNumber = master3;
-    } else if (x == 4) {
-        var valueNumber = master4;
-    } else if (x == 5) {
-        var valueNumber = master5;
-    } else if (x == 6) {
-        var valueNumber = master6;
-    } else if (x == 7) {
-        var valueNumber = master7;
-    } else if (x == 8) {
-        var valueNumber = master8;
-    } else if (x == 9) {
-        var valueNumber = master9;
-    } else if (x == 10) {
-        var valueNumber = master10;
-    } else if (x == 11) {
-       var valueNumber = master11;
-    } else if (x == 12) {
-       var valueNumber = master12;
-    }
     //Slider Control
     curItem.selectedLayers[0].property("Effects").property("Slider Control").property("Slider").setValueAtTime(.8+((x-1)/2),0);
     curItem.selectedLayers[0].property("Effects").property("Slider Control").property("Slider").setValueAtTime(2.5+((x-1)/2),valueNumber);
@@ -4387,31 +1025,7 @@ if (labelCheck == true) {
         for (x = 1; x <= totalBars; x++) {
             
                 //Label
-                if (x == 1) {
-                    var label = barLabel1;
-                    } else if (x == 2) {
-                    var label = barLabel2;
-                    } else if (x == 3) {
-                    var label = barLabel3;
-                    } else if (x == 4) {
-                    var label = barLabel4;
-                    } else if (x == 5) {
-                    var label = barLabel5;
-                    } else if (x == 6) {
-                    var label = barLabel6;
-                    } else if (x == 7) {
-                    var label = barLabel7;
-                    } else if (x == 8) {
-                    var label = barLabel8;
-                    } else if (x == 9) {
-                    var label = barLabel9;
-                    } else if (x == 10) {
-                    var label = barLabel10;
-                    } else if (x == 11) {
-                    var label = barLabel11;
-                    } else if (x == 12) {
-                    var label = barLabel12;
-                    }
+                var label = pLabels[x - 1];
                 
                 //Main Text Layer
                 curItem.layers.addText(label);  
@@ -4699,6 +1313,5 @@ function vBarMaker(spacingAmount) {
         //Delete Null
         curItem.layer(1).remove();
                
-}
 }
 }
