@@ -347,6 +347,12 @@ function randomBarColor() {
 function createBarShape(curItem, name, width, height, colorIndex) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
+    // Force the same anchor/position defaults a solid gets - AE's "Center
+    // Anchor Point in New Shape Layers" preference can make addShape()
+    // start from a different default depending on the machine, which
+    // throws off all the downstream anchor-point math below.
+    shapeLayer.anchorPoint.setValue([0, 0]);
+    shapeLayer.position.setValue([curItem.width / 2, curItem.height / 2]);
 
     var baseGroup = shapeLayer.property("Contents").addProperty("ADBE Vector Group");
     baseGroup.name = "Bar Group";
@@ -370,6 +376,10 @@ function createBarShape(curItem, name, width, height, colorIndex) {
 function createLineShape(curItem, name, vertices, strokeWidth) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
+    // Same reasoning as createBarShape() - force solid-like anchor/position
+    // defaults so the downstream anchor-point math isn't thrown off.
+    shapeLayer.anchorPoint.setValue([0, 0]);
+    shapeLayer.position.setValue([curItem.width / 2, curItem.height / 2]);
 
     var baseGroup = shapeLayer.property("Contents").addProperty("ADBE Vector Group");
     baseGroup.name = "Line Group";
@@ -384,8 +394,11 @@ function createLineShape(curItem, name, vertices, strokeWidth) {
 
     var strokeGroup = shapeLayer.property("Contents").property("Line Group").property("Contents").addProperty("ADBE Vector Graphic - Stroke");
     strokeGroup.property("Color").setValue([1, 1, 1]);
-    strokeGroup.property("Stroke Width").setValue(strokeWidth);
-    strokeGroup.property("Line Cap").setValue(1);
+    // Visible stroke is thinner than the bounding box `strokeWidth` implies -
+    // the anchor-point math above still uses the full width/height so the
+    // line's layer bounds line up with what a same-sized solid would have had.
+    strokeGroup.property("Stroke Width").setValue(strokeWidth * 0.6);
+    strokeGroup.property("Line Cap").setValue(2); // Round Cap
 
     return shapeLayer;
 }
