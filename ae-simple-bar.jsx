@@ -481,10 +481,22 @@ for (var x = 1; x <= totalBars; x++) {
         alert("DEBUG A2: barLyr.parent=" + (barLyr.parent ? barLyr.parent.name : "null"));
         var posProp = barLyr.position;
         alert("DEBUG A3: got position property, name=" + posProp.name + " numKeys=" + posProp.numKeys);
-        var posVal = posProp.value;
-        alert("DEBUG B: posVal=" + posVal);
-        alert("DEBUG C: layer(3).anchorPoint.value=" + barLyr.anchorPoint.value);
-        alert("DEBUG D: layer(3).scale.value=" + barLyr.scale.value);
+        try {
+            var posVal = posProp.value;
+            alert("DEBUG B: posVal[0]=" + posVal[0] + " posVal[1]=" + posVal[1] + " length=" + posVal.length);
+        } catch (e) {
+            alert("DEBUG B CAUGHT ERROR: " + e.toString() + " | line=" + e.line + " | name=" + e.name);
+        }
+        try {
+            alert("DEBUG C: layer(3).anchorPoint.value=" + barLyr.anchorPoint.value);
+        } catch (e2) {
+            alert("DEBUG C CAUGHT ERROR: " + e2.toString());
+        }
+        try {
+            alert("DEBUG D: layer(3).scale.value=" + barLyr.scale.value);
+        } catch (e3) {
+            alert("DEBUG D CAUGHT ERROR: " + e3.toString());
+        }
         alert("DEBUG E: detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
     }
 
@@ -963,10 +975,22 @@ for (var x = 1; x <= totalBars; x++) {
         alert("DEBUG A2: barLyr.parent=" + (barLyr.parent ? barLyr.parent.name : "null"));
         var posProp = barLyr.position;
         alert("DEBUG A3: got position property, name=" + posProp.name + " numKeys=" + posProp.numKeys);
-        var posVal = posProp.value;
-        alert("DEBUG B: posVal=" + posVal);
-        alert("DEBUG C: layer(3).anchorPoint.value=" + barLyr.anchorPoint.value);
-        alert("DEBUG D: layer(3).scale.value=" + barLyr.scale.value);
+        try {
+            var posVal = posProp.value;
+            alert("DEBUG B: posVal[0]=" + posVal[0] + " posVal[1]=" + posVal[1] + " length=" + posVal.length);
+        } catch (e) {
+            alert("DEBUG B CAUGHT ERROR: " + e.toString() + " | line=" + e.line + " | name=" + e.name);
+        }
+        try {
+            alert("DEBUG C: layer(3).anchorPoint.value=" + barLyr.anchorPoint.value);
+        } catch (e2) {
+            alert("DEBUG C CAUGHT ERROR: " + e2.toString());
+        }
+        try {
+            alert("DEBUG D: layer(3).scale.value=" + barLyr.scale.value);
+        } catch (e3) {
+            alert("DEBUG D CAUGHT ERROR: " + e3.toString());
+        }
         alert("DEBUG E: detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
     }
 
