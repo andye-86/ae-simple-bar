@@ -347,6 +347,10 @@ function randomBarColor() {
 function createBarShape(curItem, name, width, height, colorIndex) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
+    // addShape() layers can come up as 3D (3-component position), which
+    // makes reading anchorPoint/scale throw "invalid numeric result" - force
+    // 2D so the rest of this behaves like a normal (2D) solid would have.
+    shapeLayer.threeDLayer = false;
 
     var baseGroup = shapeLayer.property("Contents").addProperty("ADBE Vector Group");
     baseGroup.name = "Bar Group";
@@ -377,6 +381,9 @@ function createBarShape(curItem, name, width, height, colorIndex) {
 function createLineShape(curItem, name, vertices, strokeWidth) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
+    // Same reasoning as createBarShape() - force 2D so anchorPoint/scale
+    // reads don't throw "invalid numeric result".
+    shapeLayer.threeDLayer = false;
 
     var baseGroup = shapeLayer.property("Contents").addProperty("ADBE Vector Group");
     baseGroup.name = "Line Group";
@@ -475,31 +482,6 @@ for (var x = 1; x <= totalBars; x++) {
     //BAR MAKER FUNCTION
     vBarMaker(x);
 
-    if (x == 1) {
-        var barLyr = curItem.layer(3);
-        alert("DEBUG A: layer count=" + curItem.numLayers + " layer(3) name=" + barLyr.name);
-        alert("DEBUG A2: barLyr.parent=" + (barLyr.parent ? barLyr.parent.name : "null"));
-        var posProp = barLyr.position;
-        alert("DEBUG A3: got position property, name=" + posProp.name + " numKeys=" + posProp.numKeys);
-        try {
-            var posVal = posProp.value;
-            alert("DEBUG B: posVal[0]=" + posVal[0] + " posVal[1]=" + posVal[1] + " length=" + posVal.length);
-        } catch (e) {
-            alert("DEBUG B CAUGHT ERROR: " + e.toString() + " | line=" + e.line + " | name=" + e.name);
-        }
-        try {
-            alert("DEBUG C: layer(3).anchorPoint.value=" + barLyr.anchorPoint.value);
-        } catch (e2) {
-            alert("DEBUG C CAUGHT ERROR: " + e2.toString());
-        }
-        try {
-            alert("DEBUG D: layer(3).scale.value=" + barLyr.scale.value);
-        } catch (e3) {
-            alert("DEBUG D CAUGHT ERROR: " + e3.toString());
-        }
-        alert("DEBUG E: detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
-    }
-
     //Parenting
     curItem.layer(1).parent = curItem.layer(2);
     curItem.layer(2).parent = curItem.layer((x*3)+1);
@@ -507,11 +489,6 @@ for (var x = 1; x <= totalBars; x++) {
 
     //Rename Bar Layer
     curItem.layer(3).name = "Bar " + x;
-
-    if (x == 1) {
-        var parentLyr = curItem.layer(3).parent;
-        alert("DEBUG post-parent: Bar pos=" + curItem.layer(3).position.value + " anchor=" + curItem.layer(3).anchorPoint.value + " | parent name=" + parentLyr.name + " parent pos=" + parentLyr.position.value + " parent anchor=" + parentLyr.anchorPoint.value + " parent scale=" + parentLyr.scale.value);
-    }
 
     //EXPRESSIONS
         
@@ -884,23 +861,17 @@ function vBarMaker(spacingAmount) {
         curItem.layer(2).opacity.setValueAtTime(.8+((spacingAmount-1)/2),0);
         curItem.layer(2).opacity.setValueAtTime(1.5+((spacingAmount-1)/2),100);
 
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: opacity done"); }
-
         //Create Null and Parent All Items
         curItem.layers.addNull();
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: null added"); }
         curItem.layer(2).parent = curItem.layer(1);
         curItem.layer(3).parent = curItem.layer(1);
         curItem.layer(4).parent = curItem.layer(1);
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: parented to temp null"); }
 
         //Move Null to the Left of the screen.
         curItem.layer(1).position.setValue([((curItem.width*(.1260 + (.0014*totalBars)))*spacingAmount) - (curItem.width*.05),curItem.height/2]);
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: temp null moved"); }
 
         //Delete Null
         curItem.layer(1).remove();
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: temp null removed, returning"); }
 }
 }
 
@@ -969,40 +940,10 @@ for (var x = 1; x <= totalBars; x++) {
     //BAR MAKER FUNCTION
     vBarMaker(x);
 
-    if (x == 1) {
-        var barLyr = curItem.layer(3);
-        alert("DEBUG A: layer count=" + curItem.numLayers + " layer(3) name=" + barLyr.name);
-        alert("DEBUG A2: barLyr.parent=" + (barLyr.parent ? barLyr.parent.name : "null"));
-        var posProp = barLyr.position;
-        alert("DEBUG A3: got position property, name=" + posProp.name + " numKeys=" + posProp.numKeys);
-        try {
-            var posVal = posProp.value;
-            alert("DEBUG B: posVal[0]=" + posVal[0] + " posVal[1]=" + posVal[1] + " length=" + posVal.length);
-        } catch (e) {
-            alert("DEBUG B CAUGHT ERROR: " + e.toString() + " | line=" + e.line + " | name=" + e.name);
-        }
-        try {
-            alert("DEBUG C: layer(3).anchorPoint.value=" + barLyr.anchorPoint.value);
-        } catch (e2) {
-            alert("DEBUG C CAUGHT ERROR: " + e2.toString());
-        }
-        try {
-            alert("DEBUG D: layer(3).scale.value=" + barLyr.scale.value);
-        } catch (e3) {
-            alert("DEBUG D CAUGHT ERROR: " + e3.toString());
-        }
-        alert("DEBUG E: detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
-    }
-
     //Parenting
     curItem.layer(1).parent = curItem.layer(2);
     curItem.layer(2).parent = curItem.layer((x*3)+1);
     curItem.layer(3).parent = curItem.layer((x*3)+1);
-
-    if (x == 1) {
-        var parentLyr = curItem.layer(3).parent;
-        alert("DEBUG post-parent: Bar pos=" + curItem.layer(3).position.value + " anchor=" + curItem.layer(3).anchorPoint.value + " | parent name=" + parentLyr.name + " parent pos=" + parentLyr.position.value + " parent anchor=" + parentLyr.anchorPoint.value + " parent scale=" + parentLyr.scale.value);
-    }
 
     //TextMoveMod
     if(totalBars <= 7) {
@@ -1426,15 +1367,11 @@ function vBarMaker(spacingAmount) {
         curItem.layer(2).opacity.setValueAtTime(.8+((spacingAmount-1)/2),0);
         curItem.layer(2).opacity.setValueAtTime(1.5+((spacingAmount-1)/2),100);
 
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: opacity done"); }
-
         //Create Null and Parent All Items
         curItem.layers.addNull();
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: null added"); }
         curItem.layer(2).parent = curItem.layer(1);
         curItem.layer(3).parent = curItem.layer(1);
         curItem.layer(4).parent = curItem.layer(1);
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: parented to temp null"); }
 
         //Move Null to the Left of the screen.
         if (totalBars < 7) {
@@ -1442,11 +1379,9 @@ function vBarMaker(spacingAmount) {
         } else {
             curItem.layer(1).position.setValue([curItem.width/2, ((curItem.height*.133)*(spacingAmount*.88)) - (curItem.height*.05),]);
         }
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: temp null moved"); }
 
         //Delete Null
         curItem.layer(1).remove();
-        if (spacingAmount == 1) { alert("DEBUG vBarMaker: temp null removed, returning"); }
 
 }
 }
