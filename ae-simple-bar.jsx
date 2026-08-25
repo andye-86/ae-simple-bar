@@ -150,20 +150,30 @@ function randomBarColor() {
     return [Math.random(), Math.random(), Math.random()];
 }
 
-//Builds a rectangular shape layer sized the way addSolid() used to size a
-//solid. Rect position is offset to (width/2, height/2) so the rectangle spans
+//Builds a rectangle shape layer the same way ae-simple-ring builds its color
+//squares: an "ADBE Vector Group" holding a Rect path + Fill, addressed by
+//display name (Contents/Size/Position/Color), which is the pattern already
+//proven to work in this project's other scripts.
+//Rect position is offset to (width/2, height/2) so the rectangle spans
 //[0,0] to [width,height] in layer space, matching a solid's footage bounds -
 //this keeps the anchor point math in vBarMaker() working unchanged.
-function createBarShape(name, width, height) {
+//The Fill's Color is wired straight to the matching "Bar Color N" Color
+//Control on MASTER CONTROL, same as the ring script does at creation time.
+function createBarShape(name, width, height, colorIndex) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
-    var rootContents = shapeLayer.property("ADBE Root Vectors Group");
-    var group = rootContents.addProperty("ADBE Vector Group");
-    var groupContents = group.property("ADBE Vectors Group");
-    var rectPath = groupContents.addProperty("ADBE Vector Shape - Rect");
-    rectPath.property("ADBE Vector Rect Size").setValue([width, height]);
-    rectPath.property("ADBE Vector Rect Position").setValue([width / 2, height / 2]);
-    groupContents.addProperty("ADBE Vector Graphic - Fill");
+
+    var baseGroup = shapeLayer.property("Contents").addProperty("ADBE Vector Group");
+    baseGroup.name = "Bar Group";
+
+    var pathGroup = shapeLayer.property("Contents").property("Bar Group").property("Contents").addProperty("ADBE Vector Shape - Rect");
+    pathGroup.name = "Bar Path";
+    pathGroup.property("Size").setValue([width, height]);
+    pathGroup.property("Position").setValue([width / 2, height / 2]);
+
+    var fillGroup = shapeLayer.property("Contents").property("Bar Group").property("Contents").addProperty("ADBE Vector Graphic - Fill");
+    fillGroup.property("Color").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Bar Color " + colorIndex + "\")(\"Color\")";
+
     return shapeLayer;
 }
 
@@ -2013,8 +2023,7 @@ for (var x = 1; x <= totalBars; x++) {
         curItem.layer(2).position.expression  = "temp = (((thisComp.height/100)*((((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") - " + minLine + ") * (100)) / (" + maxLine + " - " + minLine + "))  + 0))*-1); [thisComp.layer(\"Bar " + x +"\").transform.position[0], (temp+(thisComp.height/2))-thisComp.height*.01]"    
     }
     
-    //Bar Expressions (shape layer's own vector fill, driven by the Master Control's random color)
-    curItem.layer(3).property("ADBE Root Vectors Group").property("ADBE Vector Group").property("ADBE Vectors Group").property("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Bar Color " + x + "\")(\"Color\")"
+    //Bar Expressions (fill color is wired up in createBarShape() at creation time)
     curItem.layer(3).scale.expression = "temp = ((((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") - " + minLine + ") * (100)) / (" + maxLine + " - " + minLine + "))  + 0); [100, temp]";
 }
 
@@ -2325,7 +2334,7 @@ function vBarMaker(spacingAmount) {
         //Create the Bar
         var barWidth = Math.round(detVar*.16);
         var barHeight = detVar;
-        createBarShape("Bar", barWidth, barHeight);
+        createBarShape("Bar", barWidth, barHeight, spacingAmount);
         curItem.layer(1).label = 6;
 
         var barLayerWidth = barWidth/2;       //Layer Width
@@ -4251,8 +4260,7 @@ for (var x = 1; x <= totalBars; x++) {
     curItem.layer(2).property("Source Text").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\").value.toFixed(0)"
     curItem.layer(2).position.expression  = "temp = (((thisComp.width/100)*(((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") - " + minLine + ") * (100)) / (" + maxLine + " - " + minLine + "))  + 0))*-1; [((temp+(thisComp.width/2))-thisComp.height*.01)*-1+(thisComp.width*.004), thisComp.layer(\"Bar " + x +"\").transform.position[1] + (thisComp.height*" + textMoveMod +")]"
     
-    //Bar Expressions (shape layer's own vector fill, driven by the Master Control's random color)
-    curItem.layer(3).property("ADBE Root Vectors Group").property("ADBE Vector Group").property("ADBE Vectors Group").property("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Bar Color " + x + "\")(\"Color\")"
+    //Bar Expressions (fill color is wired up in createBarShape() at creation time)
     curItem.layer(3).scale.expression = "temp = (((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\"))- 0) - "+minLine+") * (100-0)/("+maxLine+" - "+minLine+");  [100, temp]";
     
 }
@@ -4594,7 +4602,7 @@ function vBarMaker(spacingAmount) {
         //Create the Bar
         var barWidth = Math.round(detVar*.10);
         var barHeight = curItem.width;
-        createBarShape("Bar", barWidth, barHeight);
+        createBarShape("Bar", barWidth, barHeight, spacingAmount);
         curItem.layer(1).label = 6;
 
         var barLayerWidth = barWidth/2;       //Layer Width
