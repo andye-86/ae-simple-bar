@@ -472,18 +472,27 @@ for (var x = 1; x <= totalBars; x++) {
 //Create the set number of Bars 
 for (var x = 1; x <= totalBars; x++) {
     
-    //BAR MAKER FUNCTION    
+    //BAR MAKER FUNCTION
     vBarMaker(x);
+
+    if (x == 1) {
+        alert("DEBUG pre-parent: Bar pos=" + curItem.layer(3).position.value + " anchor=" + curItem.layer(3).anchorPoint.value + " scale=" + curItem.layer(3).scale.value + " | detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
+    }
 
     //Parenting
     curItem.layer(1).parent = curItem.layer(2);
     curItem.layer(2).parent = curItem.layer((x*3)+1);
     curItem.layer(3).parent = curItem.layer((x*3)+1);
-    
+
     //Rename Bar Layer
     curItem.layer(3).name = "Bar " + x;
-    
-    //EXPRESSIONS    
+
+    if (x == 1) {
+        var parentLyr = curItem.layer(3).parent;
+        alert("DEBUG post-parent: Bar pos=" + curItem.layer(3).position.value + " anchor=" + curItem.layer(3).anchorPoint.value + " | parent name=" + parentLyr.name + " parent pos=" + parentLyr.position.value + " parent anchor=" + parentLyr.anchorPoint.value + " parent scale=" + parentLyr.scale.value);
+    }
+
+    //EXPRESSIONS
         
     //% Expressions
     curItem.layer(1).position.expression = "x = transform.position[0]; y = transform.position[1]; if (thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") < 9) { [x/1.65,y] } else { [x,y] }"    
@@ -930,14 +939,23 @@ for (var x = 1; x <= totalBars; x++) {
 //Create the set number of Bars 
 for (var x = 1; x <= totalBars; x++) {
     
-    //BAR MAKER FUNCTION    
+    //BAR MAKER FUNCTION
     vBarMaker(x);
+
+    if (x == 1) {
+        alert("DEBUG pre-parent: Bar pos=" + curItem.layer(3).position.value + " anchor=" + curItem.layer(3).anchorPoint.value + " scale=" + curItem.layer(3).scale.value + " | detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
+    }
 
     //Parenting
     curItem.layer(1).parent = curItem.layer(2);
     curItem.layer(2).parent = curItem.layer((x*3)+1);
     curItem.layer(3).parent = curItem.layer((x*3)+1);
-    
+
+    if (x == 1) {
+        var parentLyr = curItem.layer(3).parent;
+        alert("DEBUG post-parent: Bar pos=" + curItem.layer(3).position.value + " anchor=" + curItem.layer(3).anchorPoint.value + " | parent name=" + parentLyr.name + " parent pos=" + parentLyr.position.value + " parent anchor=" + parentLyr.anchorPoint.value + " parent scale=" + parentLyr.scale.value);
+    }
+
     //TextMoveMod
     if(totalBars <= 7) {
     var textMoveMod = .038;
