@@ -159,7 +159,7 @@ function randomBarColor() {
 //this keeps the anchor point math in vBarMaker() working unchanged.
 //The Fill's Color is wired straight to the matching "Bar Color N" Color
 //Control on MASTER CONTROL, same as the ring script does at creation time.
-function createBarShape(name, width, height, colorIndex) {
+function createBarShape(curItem, name, width, height, colorIndex) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
 
@@ -2346,7 +2346,7 @@ function vBarMaker(spacingAmount) {
         //Create the Bar
         var barWidth = Math.round(detVar*.16);
         var barHeight = detVar;
-        createBarShape("Bar", barWidth, barHeight, spacingAmount);
+        createBarShape(curItem, "Bar", barWidth, barHeight, spacingAmount);
         if (spacingAmount == 1) {
             alert("DEBUG: vBarMaker(hor) - shape created for bar 1, barWidth=" + barWidth + " barHeight=" + barHeight);
         }
@@ -4629,7 +4629,7 @@ function vBarMaker(spacingAmount) {
         //Create the Bar
         var barWidth = Math.round(detVar*.10);
         var barHeight = curItem.width;
-        createBarShape("Bar", barWidth, barHeight, spacingAmount);
+        createBarShape(curItem, "Bar", barWidth, barHeight, spacingAmount);
         if (spacingAmount == 1) {
             alert("DEBUG: vBarMaker(vert) - shape created for bar 1, barWidth=" + barWidth + " barHeight=" + barHeight);
         }
