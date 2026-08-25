@@ -347,12 +347,6 @@ function randomBarColor() {
 function createBarShape(curItem, name, width, height, colorIndex) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
-    // Force the same anchor/position defaults a solid gets - AE's "Center
-    // Anchor Point in New Shape Layers" preference can make addShape()
-    // start from a different default depending on the machine, which
-    // throws off all the downstream anchor-point math below.
-    shapeLayer.anchorPoint.setValue([0, 0]);
-    shapeLayer.position.setValue([curItem.width / 2, curItem.height / 2]);
 
     var baseGroup = shapeLayer.property("Contents").addProperty("ADBE Vector Group");
     baseGroup.name = "Bar Group";
@@ -365,6 +359,13 @@ function createBarShape(curItem, name, width, height, colorIndex) {
     var fillGroup = shapeLayer.property("Contents").property("Bar Group").property("Contents").addProperty("ADBE Vector Graphic - Fill");
     fillGroup.property("Color").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Bar Color " + colorIndex + "\")(\"Color\")";
 
+    // Force the same anchor/position defaults a solid gets, AFTER content is
+    // added - AE's "Center Anchor Point in New Shape Layers" preference can
+    // re-center the layer's anchor/position as soon as it gets content,
+    // which would silently undo this if set right after addShape() instead.
+    shapeLayer.anchorPoint.setValue([0, 0]);
+    shapeLayer.position.setValue([curItem.width / 2, curItem.height / 2]);
+
     return shapeLayer;
 }
 
@@ -376,10 +377,6 @@ function createBarShape(curItem, name, width, height, colorIndex) {
 function createLineShape(curItem, name, vertices, strokeWidth) {
     var shapeLayer = curItem.layers.addShape();
     shapeLayer.name = name;
-    // Same reasoning as createBarShape() - force solid-like anchor/position
-    // defaults so the downstream anchor-point math isn't thrown off.
-    shapeLayer.anchorPoint.setValue([0, 0]);
-    shapeLayer.position.setValue([curItem.width / 2, curItem.height / 2]);
 
     var baseGroup = shapeLayer.property("Contents").addProperty("ADBE Vector Group");
     baseGroup.name = "Line Group";
@@ -399,6 +396,13 @@ function createLineShape(curItem, name, vertices, strokeWidth) {
     // line's layer bounds line up with what a same-sized solid would have had.
     strokeGroup.property("Stroke Width").setValue(strokeWidth * 0.6);
     strokeGroup.property("Line Cap").setValue(2); // Round Cap
+
+    // Force the same anchor/position defaults a solid gets, AFTER content is
+    // added - AE's "Center Anchor Point in New Shape Layers" preference can
+    // re-center the layer's anchor/position as soon as it gets content,
+    // which would silently undo this if set right after addShape() instead.
+    shapeLayer.anchorPoint.setValue([0, 0]);
+    shapeLayer.position.setValue([curItem.width / 2, curItem.height / 2]);
 
     return shapeLayer;
 }
