@@ -362,6 +362,34 @@ function createBarShape(curItem, name, width, height, colorIndex) {
     return shapeLayer;
 }
 
+//Creates a straight, stroked-line shape layer (no fill) instead of a thin
+//solid, for the axis lines. `vertices` is a two-point path in layer space;
+//`strokeWidth` is the line thickness. Callers keep tracking their own
+//width/height (the same values used to build the path) instead of reading
+//them back from the layer, since shape layers have no .width/.height.
+function createLineShape(curItem, name, vertices, strokeWidth) {
+    var shapeLayer = curItem.layers.addShape();
+    shapeLayer.name = name;
+
+    var baseGroup = shapeLayer.property("Contents").addProperty("ADBE Vector Group");
+    baseGroup.name = "Line Group";
+
+    var pathGroup = shapeLayer.property("Contents").property("Line Group").property("Contents").addProperty("ADBE Vector Shape - Group");
+    var lineShape = new Shape();
+    lineShape.vertices = vertices;
+    lineShape.inTangents = [[0, 0], [0, 0]];
+    lineShape.outTangents = [[0, 0], [0, 0]];
+    lineShape.closed = false;
+    pathGroup.property("ADBE Vector Shape").setValue(lineShape);
+
+    var strokeGroup = shapeLayer.property("Contents").property("Line Group").property("Contents").addProperty("ADBE Vector Graphic - Stroke");
+    strokeGroup.property("Color").setValue([1, 1, 1]);
+    strokeGroup.property("Stroke Width").setValue(strokeWidth);
+    strokeGroup.property("Line Cap").setValue(1);
+
+    return shapeLayer;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //Horizontal Graph Maker
@@ -460,11 +488,13 @@ for (var x = 1; x <= totalBars; x++) {
 /////////CREATE BACKGROUND//////////
 
 //Create the Vertical Bar
-curItem.layers.addSolid([255,255,255],"Vertical Bar", Math.round(detVar*.02), detVar, pxlAsp);
+var vBarThickness = Math.round(detVar*.02);
+var vBarLength = detVar;
+createLineShape(curItem, "Vertical Bar", [[vBarThickness / 2, 0], [vBarThickness / 2, vBarLength]], vBarThickness);
 curItem.selectedLayers[0].label = 9;
 
-var background1LayerWidth = curItem.selectedLayers[0].width/2;       //Layer Width
-var background1LayerHeight = curItem.selectedLayers[0].height/2;     //Layer Height
+var background1LayerWidth = vBarThickness/2;       //Layer Width
+var background1LayerHeight = vBarLength/2;     //Layer Height
 
 //Define Anchor Position
 var anchorPX = background1LayerWidth;
@@ -476,13 +506,13 @@ var curPositionY = curItem.selectedLayers[0].position.value[1];
 var curAPX = curItem.selectedLayers[0].anchorPoint.value[0];
 var curAPY = curItem.selectedLayers[0].anchorPoint.value[1];
 
-//Define Amount to move 
-var moveX = curAPX - anchorPX; 
+//Define Amount to move
+var moveX = curAPX - anchorPX;
 var moveY = curAPY - anchorPY;
 
 //Actions
 curItem.selectedLayers[0].anchorPoint.setValue([anchorPX,anchorPY]);
-curItem.selectedLayers[0].position.setValue([curPositionX - moveX, curPositionY - moveY]); 
+curItem.selectedLayers[0].position.setValue([curPositionX - moveX, curPositionY - moveY]);
 
 //Move to the side
 var curPositionX = curItem.selectedLayers[0].position.value[0];
@@ -491,11 +521,13 @@ var curPositionY = curItem.selectedLayers[0].position.value[1];
 curItem.selectedLayers[0].position.setValue([0, curPositionY]);
 
 //Create the Horizontal Bar
-curItem.layers.addSolid([255,255,255],"Horizontal Bar", Math.round((totalBars/7) * curItem.width), Math.round(detVar*.02), pxlAsp);
+var hBarLength = Math.round((totalBars/7) * curItem.width);
+var hBarThickness = Math.round(detVar*.02);
+createLineShape(curItem, "Horizontal Bar", [[0, hBarThickness / 2], [hBarLength, hBarThickness / 2]], hBarThickness);
 curItem.selectedLayers[0].label = 9;
 
-var background1LayerWidth = curItem.selectedLayers[0].width/2;       //Layer Width
-var background1LayerHeight = curItem.selectedLayers[0].height/2;     //Layer Height
+var background1LayerWidth = hBarLength/2;       //Layer Width
+var background1LayerHeight = hBarThickness/2;     //Layer Height
 
 //Define Anchor Position
 var anchorPX =0;
@@ -923,10 +955,12 @@ if (totalBars > 7) {
     }
 
 //Create the Vertical Bar
-curItem.layers.addSolid([255,255,255],"Vertical Bar", Math.round(detVar*.02), Math.round((totalBars/BGdivider) * curItem.height), pxlAsp );
+var vBarThickness = Math.round(detVar*.02);
+var vBarLength = Math.round((totalBars/BGdivider) * curItem.height);
+createLineShape(curItem, "Vertical Bar", [[vBarThickness / 2, 0], [vBarThickness / 2, vBarLength]], vBarThickness);
 
-var background1LayerWidth = curItem.selectedLayers[0].width/2;       //Layer Width
-var background1LayerHeight = curItem.selectedLayers[0].height/2;     //Layer Height
+var background1LayerWidth = vBarThickness/2;       //Layer Width
+var background1LayerHeight = vBarLength/2;     //Layer Height
 
 //Define Anchor Position
 var anchorPX = background1LayerWidth;
@@ -938,25 +972,27 @@ var curPositionY = curItem.selectedLayers[0].position.value[1];
 var curAPX = curItem.selectedLayers[0].anchorPoint.value[0];
 var curAPY = curItem.selectedLayers[0].anchorPoint.value[1];
 
-//Define Amount to move 
-var moveX = curAPX - anchorPX; 
+//Define Amount to move
+var moveX = curAPX - anchorPX;
 var moveY = curAPY - anchorPY;
 
 //Actions
 curItem.selectedLayers[0].anchorPoint.setValue([anchorPX,anchorPY]);
-curItem.selectedLayers[0].position.setValue([curPositionX - moveX, curPositionY - moveY]); 
+curItem.selectedLayers[0].position.setValue([curPositionX - moveX, curPositionY - moveY]);
 
 //Move to the side
 var curPositionX = curItem.selectedLayers[0].position.value[0];
 var curPositionY = curItem.selectedLayers[0].position.value[1];
 
-curItem.selectedLayers[0].position.setValue([0, (Math.round((totalBars/BGdivider)*curItem.height))*.992]);
+curItem.selectedLayers[0].position.setValue([0, vBarLength*.992]);
 
 //Create the Horizontal Bar
-curItem.layers.addSolid([255,255,255],"Horizontal Bar", curItem.width, Math.round(detVar*.02), pxlAsp );
+var hBarLength = curItem.width;
+var hBarThickness = Math.round(detVar*.02);
+createLineShape(curItem, "Horizontal Bar", [[0, hBarThickness / 2], [hBarLength, hBarThickness / 2]], hBarThickness);
 
-var background1LayerWidth = curItem.selectedLayers[0].width/2;       //Layer Width
-var background1LayerHeight = curItem.selectedLayers[0].height/2;     //Layer Height
+var background1LayerWidth = hBarLength/2;       //Layer Width
+var background1LayerHeight = hBarThickness/2;     //Layer Height
 
 //Define Anchor Position
 var anchorPX =0;
