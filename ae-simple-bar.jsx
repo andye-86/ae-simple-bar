@@ -859,21 +859,27 @@ function vBarMaker(spacingAmount) {
         //Add Opacity Animation to Text and %
         curItem.layer(1).opacity.setValueAtTime(.8+((spacingAmount-1)/2),0);
         curItem.layer(1).opacity.setValueAtTime(1.5+((spacingAmount-1)/2),100);
-        
+
         curItem.layer(2).opacity.setValueAtTime(.8+((spacingAmount-1)/2),0);
         curItem.layer(2).opacity.setValueAtTime(1.5+((spacingAmount-1)/2),100);
-        
+
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: opacity done"); }
+
         //Create Null and Parent All Items
         curItem.layers.addNull();
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: null added"); }
         curItem.layer(2).parent = curItem.layer(1);
         curItem.layer(3).parent = curItem.layer(1);
         curItem.layer(4).parent = curItem.layer(1);
-       
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: parented to temp null"); }
+
         //Move Null to the Left of the screen.
         curItem.layer(1).position.setValue([((curItem.width*(.1260 + (.0014*totalBars)))*spacingAmount) - (curItem.width*.05),curItem.height/2]);
-        
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: temp null moved"); }
+
         //Delete Null
         curItem.layer(1).remove();
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: temp null removed, returning"); }
 }
 }
 
@@ -1374,25 +1380,31 @@ function vBarMaker(spacingAmount) {
         //Add Opacity Animation to Text and %
         curItem.layer(1).opacity.setValueAtTime(.8+((spacingAmount-1)/2),0);
         curItem.layer(1).opacity.setValueAtTime(1.5+((spacingAmount-1)/2),100);
-        
+
         curItem.layer(2).opacity.setValueAtTime(.8+((spacingAmount-1)/2),0);
         curItem.layer(2).opacity.setValueAtTime(1.5+((spacingAmount-1)/2),100);
-                
+
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: opacity done"); }
+
         //Create Null and Parent All Items
         curItem.layers.addNull();
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: null added"); }
         curItem.layer(2).parent = curItem.layer(1);
         curItem.layer(3).parent = curItem.layer(1);
         curItem.layer(4).parent = curItem.layer(1);
-        
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: parented to temp null"); }
+
         //Move Null to the Left of the screen.
         if (totalBars < 7) {
             curItem.layer(1).position.setValue([curItem.width/2, ((curItem.height*.133)*spacingAmount) - (curItem.height*.05),]);
         } else {
             curItem.layer(1).position.setValue([curItem.width/2, ((curItem.height*.133)*(spacingAmount*.88)) - (curItem.height*.05),]);
         }
-   
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: temp null moved"); }
+
         //Delete Null
         curItem.layer(1).remove();
-               
+        if (spacingAmount == 1) { alert("DEBUG vBarMaker: temp null removed, returning"); }
+
 }
 }
