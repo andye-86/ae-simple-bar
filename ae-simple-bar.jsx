@@ -476,7 +476,11 @@ for (var x = 1; x <= totalBars; x++) {
     vBarMaker(x);
 
     if (x == 1) {
-        alert("DEBUG pre-parent: Bar pos=" + curItem.layer(3).position.value + " anchor=" + curItem.layer(3).anchorPoint.value + " scale=" + curItem.layer(3).scale.value + " | detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
+        alert("DEBUG A: layer count=" + curItem.numLayers + " layer(3) name=" + curItem.layer(3).name);
+        alert("DEBUG B: layer(3).position.value=" + curItem.layer(3).position.value);
+        alert("DEBUG C: layer(3).anchorPoint.value=" + curItem.layer(3).anchorPoint.value);
+        alert("DEBUG D: layer(3).scale.value=" + curItem.layer(3).scale.value);
+        alert("DEBUG E: detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
     }
 
     //Parenting
@@ -949,7 +953,11 @@ for (var x = 1; x <= totalBars; x++) {
     vBarMaker(x);
 
     if (x == 1) {
-        alert("DEBUG pre-parent: Bar pos=" + curItem.layer(3).position.value + " anchor=" + curItem.layer(3).anchorPoint.value + " scale=" + curItem.layer(3).scale.value + " | detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
+        alert("DEBUG A: layer count=" + curItem.numLayers + " layer(3) name=" + curItem.layer(3).name);
+        alert("DEBUG B: layer(3).position.value=" + curItem.layer(3).position.value);
+        alert("DEBUG C: layer(3).anchorPoint.value=" + curItem.layer(3).anchorPoint.value);
+        alert("DEBUG D: layer(3).scale.value=" + curItem.layer(3).scale.value);
+        alert("DEBUG E: detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
     }
 
     //Parenting
