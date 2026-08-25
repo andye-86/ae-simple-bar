@@ -476,10 +476,15 @@ for (var x = 1; x <= totalBars; x++) {
     vBarMaker(x);
 
     if (x == 1) {
-        alert("DEBUG A: layer count=" + curItem.numLayers + " layer(3) name=" + curItem.layer(3).name);
-        alert("DEBUG B: layer(3).position.value=" + curItem.layer(3).position.value);
-        alert("DEBUG C: layer(3).anchorPoint.value=" + curItem.layer(3).anchorPoint.value);
-        alert("DEBUG D: layer(3).scale.value=" + curItem.layer(3).scale.value);
+        var barLyr = curItem.layer(3);
+        alert("DEBUG A: layer count=" + curItem.numLayers + " layer(3) name=" + barLyr.name);
+        alert("DEBUG A2: barLyr.parent=" + (barLyr.parent ? barLyr.parent.name : "null"));
+        var posProp = barLyr.position;
+        alert("DEBUG A3: got position property, name=" + posProp.name + " numKeys=" + posProp.numKeys);
+        var posVal = posProp.value;
+        alert("DEBUG B: posVal=" + posVal);
+        alert("DEBUG C: layer(3).anchorPoint.value=" + barLyr.anchorPoint.value);
+        alert("DEBUG D: layer(3).scale.value=" + barLyr.scale.value);
         alert("DEBUG E: detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
     }
 
@@ -953,10 +958,15 @@ for (var x = 1; x <= totalBars; x++) {
     vBarMaker(x);
 
     if (x == 1) {
-        alert("DEBUG A: layer count=" + curItem.numLayers + " layer(3) name=" + curItem.layer(3).name);
-        alert("DEBUG B: layer(3).position.value=" + curItem.layer(3).position.value);
-        alert("DEBUG C: layer(3).anchorPoint.value=" + curItem.layer(3).anchorPoint.value);
-        alert("DEBUG D: layer(3).scale.value=" + curItem.layer(3).scale.value);
+        var barLyr = curItem.layer(3);
+        alert("DEBUG A: layer count=" + curItem.numLayers + " layer(3) name=" + barLyr.name);
+        alert("DEBUG A2: barLyr.parent=" + (barLyr.parent ? barLyr.parent.name : "null"));
+        var posProp = barLyr.position;
+        alert("DEBUG A3: got position property, name=" + posProp.name + " numKeys=" + posProp.numKeys);
+        var posVal = posProp.value;
+        alert("DEBUG B: posVal=" + posVal);
+        alert("DEBUG C: layer(3).anchorPoint.value=" + barLyr.anchorPoint.value);
+        alert("DEBUG D: layer(3).scale.value=" + barLyr.scale.value);
         alert("DEBUG E: detVar=" + detVar + " compW=" + curItem.width + " compH=" + curItem.height);
     }
 
