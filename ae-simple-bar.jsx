@@ -28,19 +28,6 @@ simpleBar.alignChildren = ["center", "top"];
 simpleBar.spacing = 10;
 simpleBar.margins = 16;
 
-// PANEL1 - orientation
-// =====================
-var panel1 = simpleBar.add("panel", undefined, undefined, {name: "panel1"});
-panel1.preferredSize.width = 280;
-panel1.orientation = "row";
-panel1.alignChildren = ["center", "center"];
-panel1.spacing = 10;
-panel1.margins = 10;
-
-var horizontalRadioButton = panel1.add("radiobutton", undefined, "Bars on X-Axis");
-var verticalRadioButton = panel1.add("radiobutton", undefined, "Bars on Y-Axis");
-horizontalRadioButton.value = true;
-
 // PANEL2 - bar count
 // ====================
 var panel2 = simpleBar.add("panel", undefined, undefined, {name: "panel2"});
@@ -78,9 +65,26 @@ var maxText = panel3.add("statictext", undefined, "Max");
 var maxField = panel3.add("edittext", undefined, "100");
 maxField.characters = 5;
 
-// GROUP2 - checkboxes
-// =====================
-var group2 = simpleBar.add("group", undefined, {name: "group2"});
+// PANEL4 - Visual Settings (orientation on top, checkboxes on the bottom)
+// ==========================================================================
+var panel4 = simpleBar.add("panel", undefined, undefined, {name: "panel4"});
+panel4.text = "Visual Settings";
+panel4.preferredSize.width = 280;
+panel4.orientation = "column";
+panel4.alignChildren = ["center", "center"];
+panel4.spacing = 10;
+panel4.margins = 10;
+
+var group1b = panel4.add("group", undefined, {name: "group1b"});
+group1b.orientation = "row";
+group1b.alignChildren = ["center", "center"];
+group1b.spacing = 10;
+
+var horizontalRadioButton = group1b.add("radiobutton", undefined, "Bars on X-Axis");
+var verticalRadioButton = group1b.add("radiobutton", undefined, "Bars on Y-Axis");
+horizontalRadioButton.value = true;
+
+var group2 = panel4.add("group", undefined, {name: "group2"});
 group2.orientation = "row";
 group2.alignChildren = ["left", "center"];
 group2.spacing = 10;
@@ -197,13 +201,13 @@ function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axi
     var group2 = group1.add("group", undefined, {name: "group2"});
     group2.orientation = "column";
     group2.alignChildren = ["left", "top"];
-    group2.spacing = 10;
+    group2.spacing = 14;
     group2.margins = 0;
 
     var group13 = group1.add("group", undefined, {name: "group13"});
     group13.orientation = "column";
     group13.alignChildren = ["left", "top"];
-    group13.spacing = 10;
+    group13.spacing = 14;
     group13.margins = 0;
 
     // BAR PANELS - one panel per bar, balanced across the two columns.
@@ -223,8 +227,8 @@ function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axi
         var panel = targetGroup.add("panel", undefined, undefined, {name: "panel" + i});
         panel.orientation = "column";
         panel.alignChildren = ["left", "top"];
-        panel.spacing = 10;
-        panel.margins = 10;
+        panel.spacing = 14;
+        panel.margins = 16;
 
         if (axisCheck) {
             var labelGroup = panel.add("group", undefined, {name: "labelGroup" + i});
@@ -248,7 +252,7 @@ function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axi
         var valueGroup = panel.add("group", undefined, {name: "valueGroup" + i});
         valueGroup.orientation = "row";
         valueGroup.alignChildren = ["left", "center"];
-        valueGroup.spacing = 10;
+        valueGroup.spacing = 12;
         valueGroup.margins = 0;
 
         var valueStatic = valueGroup.add("statictext", undefined, undefined, {name: "valueStatic" + i});
