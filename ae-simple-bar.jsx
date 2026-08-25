@@ -55,8 +55,8 @@ panel3.text = "Define your Min and Max for the Scale";
 panel3.preferredSize.width = 280;
 panel3.orientation = "row";
 panel3.alignChildren = ["center", "center"];
-panel3.spacing = 10;
-panel3.margins = 10;
+panel3.spacing = 14;
+panel3.margins = 18;
 
 var minText = panel3.add("statictext", undefined, "Min");
 var minField = panel3.add("edittext", undefined, "0");
@@ -65,27 +65,33 @@ var maxText = panel3.add("statictext", undefined, "Max");
 var maxField = panel3.add("edittext", undefined, "100");
 maxField.characters = 5;
 
-// PANEL4 - Visual Settings (orientation on top, checkboxes on the bottom)
+// PANEL4 - Visual Settings (orientation on the left, checkboxes on the
+// right, options stacked vertically within each side, divided by a
+// vertical rule)
 // ==========================================================================
 var panel4 = simpleBar.add("panel", undefined, undefined, {name: "panel4"});
 panel4.text = "Visual Settings";
 panel4.preferredSize.width = 280;
-panel4.orientation = "column";
-panel4.alignChildren = ["center", "center"];
-panel4.spacing = 10;
-panel4.margins = 10;
+panel4.orientation = "row";
+panel4.alignChildren = ["left", "fill"];
+panel4.spacing = 14;
+panel4.margins = 14;
 
 var group1b = panel4.add("group", undefined, {name: "group1b"});
-group1b.orientation = "row";
-group1b.alignChildren = ["center", "center"];
+group1b.orientation = "column";
+group1b.alignChildren = ["left", "center"];
 group1b.spacing = 10;
 
 var horizontalRadioButton = group1b.add("radiobutton", undefined, "Bars on X-Axis");
 var verticalRadioButton = group1b.add("radiobutton", undefined, "Bars on Y-Axis");
 horizontalRadioButton.value = true;
 
+var visualDivider = panel4.add("panel", undefined, undefined, {name: "visualDivider"});
+visualDivider.alignment = ["center", "fill"];
+visualDivider.preferredSize.width = 2;
+
 var group2 = panel4.add("group", undefined, {name: "group2"});
-group2.orientation = "row";
+group2.orientation = "column";
 group2.alignChildren = ["left", "center"];
 group2.spacing = 10;
 
