@@ -79,7 +79,7 @@ panel4.margins = 14;
 
 var group1b = panel4.add("group", undefined, {name: "group1b"});
 group1b.orientation = "column";
-group1b.alignChildren = ["left", "center"];
+group1b.alignChildren = ["left", "top"];
 group1b.spacing = 10;
 
 var horizontalRadioButton = group1b.add("radiobutton", undefined, "Bars on X-Axis");
