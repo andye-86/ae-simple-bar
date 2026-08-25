@@ -182,8 +182,10 @@ function createBarShape(name, width, height, colorIndex) {
 //Horizontal Graph Maker
 function horBarGraph(pTotalBars, pMinText, pMaxText, pBarLabel, pPerLabel, pAxisLabel) {
 
+alert("DEBUG: horBarGraph started, pTotalBars=" + pTotalBars);
+
 //Set Up
-var scriptName = "Horizontal Bar Graph";  
+var scriptName = "Horizontal Bar Graph";
 var curItem = app.project.activeItem;
 var detVar = curItem.height;
 var pxlAsp = curItem.pixelAspect;
@@ -1942,6 +1944,8 @@ app.beginUndoGroup(scriptName);
 curItem.layers.addNull();  
 curItem.selectedLayers[0].name = "MASTER CONTROL";
 
+alert("DEBUG: horBarGraph - Master Null created, totalBars=" + totalBars);
+
 //Attach Controls to the the Master Null
 for (var x = 1; x <= totalBars; x++) {
     curItem.selectedLayers[0].Effects.addProperty("Slider Control");
@@ -1992,6 +1996,8 @@ for (var x = 1; x <= totalBars; x++) {
     curItem.selectedLayers[0].property("Effects").property("Color Control").name = "Bar Color " + x;
 }
 
+alert("DEBUG: horBarGraph - attach loop complete");
+
 //////////////////CREATE BARS AND ANIMATION/////////////////////
 
 
@@ -2000,6 +2006,9 @@ for (var x = 1; x <= totalBars; x++) {
     
     //BAR MAKER FUNCTION    
     vBarMaker(x);
+    if (x == 1) {
+        alert("DEBUG: horBarGraph - vBarMaker returned OK for bar 1");
+    }
     
     //Parenting
     curItem.layer(1).parent = curItem.layer(2);
@@ -2026,6 +2035,8 @@ for (var x = 1; x <= totalBars; x++) {
     //Bar Expressions (fill color is wired up in createBarShape() at creation time)
     curItem.layer(3).scale.expression = "temp = ((((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") - " + minLine + ") * (100)) / (" + maxLine + " - " + minLine + "))  + 0); [100, temp]";
 }
+
+alert("DEBUG: horBarGraph - create-bars loop complete, building background");
 
 
 /////////CREATE BACKGROUND//////////
@@ -2324,6 +2335,7 @@ app.project.activeItem.time = timeSetTo;
 
 //End Undo Group
 app.endUndoGroup();
+alert("DEBUG: horBarGraph - reached end of function (endUndoGroup done)");
 
 } //Cancel Check Wrapping
 
@@ -2335,6 +2347,9 @@ function vBarMaker(spacingAmount) {
         var barWidth = Math.round(detVar*.16);
         var barHeight = detVar;
         createBarShape("Bar", barWidth, barHeight, spacingAmount);
+        if (spacingAmount == 1) {
+            alert("DEBUG: vBarMaker(hor) - shape created for bar 1, barWidth=" + barWidth + " barHeight=" + barHeight);
+        }
         curItem.layer(1).label = 6;
 
         var barLayerWidth = barWidth/2;       //Layer Width
@@ -2418,6 +2433,8 @@ function vBarMaker(spacingAmount) {
 //////////////////////////////////////////////////////////////////////////////////////////
 //Vertical Graph Maker
 function vertBarGraph(pTotalBars, pMinText, pMaxText, pBarLabel, pPerLabel, pAxisLabel) {
+alert("DEBUG: vertBarGraph started, pTotalBars=" + pTotalBars);
+
 
 //Set Up
 var scriptName = "Vertical Bar Graph";  
@@ -4179,6 +4196,8 @@ app.beginUndoGroup(scriptName);
 curItem.layers.addNull();  
 curItem.selectedLayers[0].name = "MASTER CONTROL";
 
+alert("DEBUG: vertBarGraph - Master Null created, totalBars=" + totalBars);
+
 //Attach Controls to the the Master Null
 for (var x = 1; x <= totalBars; x++) {
     curItem.selectedLayers[0].Effects.addProperty("Slider Control");
@@ -4228,6 +4247,8 @@ for (var x = 1; x <= totalBars; x++) {
     curItem.selectedLayers[0].property("Effects").property("Color Control").name = "Bar Color " + x;
 }
 
+alert("DEBUG: vertBarGraph - attach loop complete");
+
 //////////////////CREATE BARS AND ANIMATION/////////////////////
 
 //Create the set number of Bars 
@@ -4235,6 +4256,9 @@ for (var x = 1; x <= totalBars; x++) {
     
     //BAR MAKER FUNCTION    
     vBarMaker(x);
+    if (x == 1) {
+        alert("DEBUG: vertBarGraph - vBarMaker returned OK for bar 1");
+    }
     
     //Parenting
     curItem.layer(1).parent = curItem.layer(2);
@@ -4264,6 +4288,8 @@ for (var x = 1; x <= totalBars; x++) {
     curItem.layer(3).scale.expression = "temp = (((thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\"))- 0) - "+minLine+") * (100-0)/("+maxLine+" - "+minLine+");  [100, temp]";
     
 }
+
+alert("DEBUG: vertBarGraph - create-bars loop complete, building background");
 
 
 /////////CREATE BACKGROUND//////////
@@ -4593,6 +4619,7 @@ app.project.activeItem.time = timeSetTo;
 
 //End Undo Group
 app.endUndoGroup();
+alert("DEBUG: vertBarGraph - reached end of function (endUndoGroup done)");
 
 //**********************************************************/
 //////////////////FUNCTIONS/////////////////////////
@@ -4603,6 +4630,9 @@ function vBarMaker(spacingAmount) {
         var barWidth = Math.round(detVar*.10);
         var barHeight = curItem.width;
         createBarShape("Bar", barWidth, barHeight, spacingAmount);
+        if (spacingAmount == 1) {
+            alert("DEBUG: vBarMaker(vert) - shape created for bar 1, barWidth=" + barWidth + " barHeight=" + barHeight);
+        }
         curItem.layer(1).label = 6;
 
         var barLayerWidth = barWidth/2;       //Layer Width
