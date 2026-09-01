@@ -329,6 +329,17 @@ function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axi
 //////////////////////////////////////////////////////////////////////////////////////////
 //Shared Helpers (used by both the Horizontal and Vertical graph makers)
 
+//TEMP: strips Vertical Bar/Back Plate out of the finished precomp for
+//testing. Safe to do post-precompose (all the layer-index math that
+//builds the graph has already run by then); flip back to false to
+//restore them.
+var TEMP_HIDE_EXTRAS = true;
+function stripTempExtras(builtComp) {
+    if (!TEMP_HIDE_EXTRAS) return;
+    try { builtComp.layer("Vertical Bar").remove(); } catch (e) {}
+    try { builtComp.layer("Back Plate").remove(); } catch (e) {}
+}
+
 //Random RGB color (0-1 per channel), used instead of a fixed palette so each
 //bar's color is different every time the graph is built.
 function randomBarColor() {
@@ -795,7 +806,8 @@ for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
    }
 
-curItem.layers.precompose(precomposeArray, "Horizontal Bar Graph", true);
+var horBuiltComp = curItem.layers.precompose(precomposeArray, "Horizontal Bar Graph", true);
+stripTempExtras(horBuiltComp);
 
 //Move to Correct Time Period
 var timeSetTo = (2.5+((totalBars-1)/2))+1;
@@ -1296,7 +1308,8 @@ for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
    }
 
-curItem.layers.precompose(precomposeArray, "Vertical Bar Graph", true);
+var vertBuiltComp = curItem.layers.precompose(precomposeArray, "Vertical Bar Graph", true);
+stripTempExtras(vertBuiltComp);
 
 //Move to Correct Time Period
 var timeSetTo = (2.5+((totalBars-1)/2))+1;
