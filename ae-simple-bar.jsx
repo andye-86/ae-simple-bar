@@ -622,19 +622,22 @@ curItem.selectedLayers[0].position.setValue([0, baselineY]);
 
 
 //Center All Objects
+//Horizontal Bar is created after Vertical Bar, so it's the one that ends
+//up as layer(1) (AE stacks newest on top) - layer(2) is actually Vertical
+//Bar. Bars ride along with whichever layer they're temp-parented to here,
+//and that layer MUST end up at groupShift for bar-centering to hold - so
+//bars are parented to layer(2) (Vertical Bar, the axis reference that
+//doesn't need to span anything specific), leaving layer(1) (Horizontal
+//Bar) free to get its own correct barGroupLeftX independently.
 for(x = 1; x <= totalBars; x++) {
-        curItem.layer((x*3)+2).parent = curItem.layer(1);
+        curItem.layer((x*3)+2).parent = curItem.layer(2);
         }
 
 var centerYone = curItem.layer(1).position.value[1];
 var centerYtwo = curItem.layer(2).position.value[1];
 
-//Vertical Bar sits one bar-step before the group (an axis reference point,
-//not meant to align with the group's own left edge) so it keeps using
-//groupShift alone. Horizontal Bar needs to actually span the bar group,
-//so it uses barGroupLeftX (groupShift plus bar 1's own spacing term).
-curItem.layer(1).position.setValue([groupShift,centerYone]);
-curItem.layer(2).position.setValue([barGroupLeftX,centerYtwo]);
+curItem.layer(1).position.setValue([barGroupLeftX,centerYone]);
+curItem.layer(2).position.setValue([groupShift,centerYtwo]);
 
 for(x = 1; x <= totalBars; x++) {
      curItem.layer((x*3)+2).parent = curItem.layer((totalBars*3)+3);   
