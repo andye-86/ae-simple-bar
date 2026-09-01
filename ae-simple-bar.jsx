@@ -329,6 +329,19 @@ function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axi
 //////////////////////////////////////////////////////////////////////////////////////////
 //Shared Helpers (used by both the Horizontal and Vertical graph makers)
 
+//TEMP DEBUG: dumps a layer's transform, catching each property read
+//individually so one bad read doesn't hide the rest.
+function debugDumpLayer(label, lyr) {
+    if (!lyr) { alert("DEBUG " + label + ": layer not found"); return; }
+    var msg = "DEBUG " + label + ": name=" + lyr.name;
+    try { msg += " pos=" + lyr.position.value; } catch (e) { msg += " pos=ERR(" + e.toString() + ")"; }
+    try { msg += " anchor=" + lyr.anchorPoint.value; } catch (e) { msg += " anchor=ERR(" + e.toString() + ")"; }
+    try { msg += " scale=" + lyr.scale.value; } catch (e) { msg += " scale=ERR(" + e.toString() + ")"; }
+    try { msg += " threeD=" + lyr.threeDLayer; } catch (e) { msg += " threeD=ERR(" + e.toString() + ")"; }
+    try { msg += " parent=" + (lyr.parent ? lyr.parent.name : "null"); } catch (e) { msg += " parent=ERR(" + e.toString() + ")"; }
+    alert(msg);
+}
+
 //Random RGB color (0-1 per channel), used instead of a fixed palette so each
 //bar's color is different every time the graph is built.
 function randomBarColor() {
@@ -782,10 +795,10 @@ var bar1 = curItem.layer("Bar 1");
 var hBar = curItem.layer("Horizontal Bar");
 var vBar = curItem.layer("Vertical Bar");
 alert("DEBUG FINAL: comp " + curItem.width + "x" + curItem.height + " detVar=" + detVar);
-alert("DEBUG FINAL: MASTER CONTROL pos=" + mc.position.value + " anchor=" + mc.anchorPoint.value + " scale=" + mc.scale.value);
-alert("DEBUG FINAL: Bar 1 pos=" + bar1.position.value + " anchor=" + bar1.anchorPoint.value + " parent=" + (bar1.parent ? bar1.parent.name : "null"));
-alert("DEBUG FINAL: Horizontal Bar pos=" + hBar.position.value + " anchor=" + hBar.anchorPoint.value + " parent=" + (hBar.parent ? hBar.parent.name : "null"));
-alert("DEBUG FINAL: Vertical Bar pos=" + vBar.position.value + " anchor=" + vBar.anchorPoint.value + " parent=" + (vBar.parent ? vBar.parent.name : "null"));
+debugDumpLayer("MASTER CONTROL", mc);
+debugDumpLayer("Bar 1", bar1);
+debugDumpLayer("Horizontal Bar", hBar);
+debugDumpLayer("Vertical Bar", vBar);
 
 curItem.layers.precompose(precomposeArray, "Horizontal Bar Graph", true);
 
@@ -1284,10 +1297,10 @@ var bar1 = curItem.layer("Bar 1");
 var hBar = curItem.layer("Horizontal Bar");
 var vBar = curItem.layer("Vertical Bar");
 alert("DEBUG FINAL: comp " + curItem.width + "x" + curItem.height + " detVar=" + detVar);
-alert("DEBUG FINAL: MASTER CONTROL pos=" + mc.position.value + " anchor=" + mc.anchorPoint.value + " scale=" + mc.scale.value);
-alert("DEBUG FINAL: Bar 1 pos=" + bar1.position.value + " anchor=" + bar1.anchorPoint.value + " parent=" + (bar1.parent ? bar1.parent.name : "null"));
-alert("DEBUG FINAL: Horizontal Bar pos=" + hBar.position.value + " anchor=" + hBar.anchorPoint.value + " parent=" + (hBar.parent ? hBar.parent.name : "null"));
-alert("DEBUG FINAL: Vertical Bar pos=" + vBar.position.value + " anchor=" + vBar.anchorPoint.value + " parent=" + (vBar.parent ? vBar.parent.name : "null"));
+debugDumpLayer("MASTER CONTROL", mc);
+debugDumpLayer("Bar 1", bar1);
+debugDumpLayer("Horizontal Bar", hBar);
+debugDumpLayer("Vertical Bar", vBar);
 
 curItem.layers.precompose(precomposeArray, "Vertical Bar Graph", true);
 
