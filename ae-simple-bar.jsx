@@ -329,21 +329,6 @@ function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axi
 //////////////////////////////////////////////////////////////////////////////////////////
 //Shared Helpers (used by both the Horizontal and Vertical graph makers)
 
-//TEMP DEBUG: dumps a layer's transform, catching each property read
-//individually so one bad read doesn't hide the rest.
-function debugDumpLayer(label, lyr) {
-    if (!lyr) { alert("DEBUG " + label + ": layer not found"); return; }
-    var msg = "DEBUG " + label + ": name=" + lyr.name;
-    // NOTE: "+ value" on a Position/Scale/AnchorPoint array throws ExtendScript's
-    // "invalid numeric result" bug - .value[0]/[1] (scalar) or .toString() avoids it.
-    try { var p = lyr.position.value; msg += " pos=(" + p[0] + "," + p[1] + ")"; } catch (e) { msg += " pos=ERR(" + e.toString() + ")"; }
-    try { var a = lyr.anchorPoint.value; msg += " anchor=(" + a[0] + "," + a[1] + ")"; } catch (e) { msg += " anchor=ERR(" + e.toString() + ")"; }
-    try { var s = lyr.scale.value; msg += " scale=(" + s[0] + "," + s[1] + ")"; } catch (e) { msg += " scale=ERR(" + e.toString() + ")"; }
-    try { msg += " threeD=" + lyr.threeDLayer; } catch (e) { msg += " threeD=ERR(" + e.toString() + ")"; }
-    try { msg += " parent=" + (lyr.parent ? lyr.parent.name : "null"); } catch (e) { msg += " parent=ERR(" + e.toString() + ")"; }
-    alert(msg);
-}
-
 //Random RGB color (0-1 per channel), used instead of a fixed palette so each
 //bar's color is different every time the graph is built.
 function randomBarColor() {
@@ -439,6 +424,9 @@ var scriptName = "Horizontal Bar Graph";
 var curItem = app.project.activeItem;
 var detVar = curItem.height;
 var pxlAsp = curItem.pixelAspect;
+//Baseline Y that bars grow up from - must match Horizontal Bar's own
+//placement (below) so a bar's bottom edge lines up with the axis line.
+var baselineY = curItem.height*.992;
 
 var checkEx;
 
@@ -590,7 +578,7 @@ curItem.selectedLayers[0].position.setValue([curPositionX - moveX, curPositionY 
 var curPositionX = curItem.selectedLayers[0].position.value[0];
 var curPositionY = curItem.selectedLayers[0].position.value[1];
 
-curItem.selectedLayers[0].position.setValue([0, curItem.height*.992]);
+curItem.selectedLayers[0].position.setValue([0, baselineY]);
 
 
 //Center All Objects
@@ -792,16 +780,6 @@ for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
    }
 
-var mc = curItem.layer("MASTER CONTROL");
-var bar1 = curItem.layer("Bar 1");
-var hBar = curItem.layer("Horizontal Bar");
-var vBar = curItem.layer("Vertical Bar");
-alert("DEBUG FINAL: comp " + curItem.width + "x" + curItem.height + " detVar=" + detVar);
-debugDumpLayer("MASTER CONTROL", mc);
-debugDumpLayer("Bar 1", bar1);
-debugDumpLayer("Horizontal Bar", hBar);
-debugDumpLayer("Vertical Bar", vBar);
-
 curItem.layers.precompose(precomposeArray, "Horizontal Bar Graph", true);
 
 //Move to Correct Time Period
@@ -841,8 +819,12 @@ function vBarMaker(spacingAmount) {
 
         //Actions
         curItem.layer(1).anchorPoint.setValue([anchorPX,anchorPY]);
-        curItem.layer(1).position.setValue([curPositionX - moveX, curPositionY - moveY]); 
-        
+        //Y is pinned to baselineY (not curPositionY - moveY) so the bar's
+        //bottom edge (now at the anchor) lines up with Horizontal Bar's own
+        //baseline instead of wherever the shape's default creation position
+        //(comp center) happened to leave it.
+        curItem.layer(1).position.setValue([curPositionX - moveX, baselineY]);
+
         /////////CREATE TEXT/////////
     
         //Main Text Layer
@@ -1293,16 +1275,6 @@ if (labelCheck == false) {
 for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
    }
-
-var mc = curItem.layer("MASTER CONTROL");
-var bar1 = curItem.layer("Bar 1");
-var hBar = curItem.layer("Horizontal Bar");
-var vBar = curItem.layer("Vertical Bar");
-alert("DEBUG FINAL: comp " + curItem.width + "x" + curItem.height + " detVar=" + detVar);
-debugDumpLayer("MASTER CONTROL", mc);
-debugDumpLayer("Bar 1", bar1);
-debugDumpLayer("Horizontal Bar", hBar);
-debugDumpLayer("Vertical Bar", vBar);
 
 curItem.layers.precompose(precomposeArray, "Vertical Bar Graph", true);
 
