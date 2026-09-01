@@ -777,6 +777,16 @@ for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
    }
 
+var mc = curItem.layer("MASTER CONTROL");
+var bar1 = curItem.layer("Bar 1");
+var hBar = curItem.layer("Horizontal Bar");
+var vBar = curItem.layer("Vertical Bar");
+alert("DEBUG FINAL: comp " + curItem.width + "x" + curItem.height + " detVar=" + detVar);
+alert("DEBUG FINAL: MASTER CONTROL pos=" + mc.position.value + " anchor=" + mc.anchorPoint.value + " scale=" + mc.scale.value);
+alert("DEBUG FINAL: Bar 1 pos=" + bar1.position.value + " anchor=" + bar1.anchorPoint.value + " parent=" + (bar1.parent ? bar1.parent.name : "null"));
+alert("DEBUG FINAL: Horizontal Bar pos=" + hBar.position.value + " anchor=" + hBar.anchorPoint.value + " parent=" + (hBar.parent ? hBar.parent.name : "null"));
+alert("DEBUG FINAL: Vertical Bar pos=" + vBar.position.value + " anchor=" + vBar.anchorPoint.value + " parent=" + (vBar.parent ? vBar.parent.name : "null"));
+
 curItem.layers.precompose(precomposeArray, "Horizontal Bar Graph", true);
 
 //Move to Correct Time Period
@@ -1268,6 +1278,16 @@ if (labelCheck == false) {
 for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
    }
+
+var mc = curItem.layer("MASTER CONTROL");
+var bar1 = curItem.layer("Bar 1");
+var hBar = curItem.layer("Horizontal Bar");
+var vBar = curItem.layer("Vertical Bar");
+alert("DEBUG FINAL: comp " + curItem.width + "x" + curItem.height + " detVar=" + detVar);
+alert("DEBUG FINAL: MASTER CONTROL pos=" + mc.position.value + " anchor=" + mc.anchorPoint.value + " scale=" + mc.scale.value);
+alert("DEBUG FINAL: Bar 1 pos=" + bar1.position.value + " anchor=" + bar1.anchorPoint.value + " parent=" + (bar1.parent ? bar1.parent.name : "null"));
+alert("DEBUG FINAL: Horizontal Bar pos=" + hBar.position.value + " anchor=" + hBar.anchorPoint.value + " parent=" + (hBar.parent ? hBar.parent.name : "null"));
+alert("DEBUG FINAL: Vertical Bar pos=" + vBar.position.value + " anchor=" + vBar.anchorPoint.value + " parent=" + (vBar.parent ? vBar.parent.name : "null"));
 
 curItem.layers.precompose(precomposeArray, "Vertical Bar Graph", true);
 
