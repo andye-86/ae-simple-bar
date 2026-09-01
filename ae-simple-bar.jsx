@@ -788,6 +788,21 @@ for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
    }
 
+var dbgMC = curItem.layer("MASTER CONTROL");
+var dbgBar1 = curItem.layer("Bar 1");
+var dbgBarN = curItem.layer("Bar " + totalBars);
+var dbgVBar = curItem.layer("Vertical Bar");
+var dbgMCPos = dbgMC.position.value;
+var dbgMCScale = dbgMC.scale.value;
+var dbgBar1Pos = dbgBar1.position.value;
+var dbgBarNPos = dbgBarN.position.value;
+var dbgVBarPos = dbgVBar.position.value;
+alert("DEBUG X: totalBars=" + totalBars + " compW=" + curItem.width);
+alert("DEBUG X: MASTER CONTROL x=" + dbgMCPos[0] + " scaleX=" + dbgMCScale[0]);
+alert("DEBUG X: Bar 1 x=" + dbgBar1Pos[0]);
+alert("DEBUG X: Bar " + totalBars + " x=" + dbgBarNPos[0]);
+alert("DEBUG X: Vertical Bar x=" + dbgVBarPos[0]);
+
 curItem.layers.precompose(precomposeArray, "Horizontal Bar Graph", true);
 
 //Move to Correct Time Period
