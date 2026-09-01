@@ -336,11 +336,8 @@ function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axi
 var TEMP_HIDE_EXTRAS = true;
 function stripTempExtras(builtComp) {
     if (!TEMP_HIDE_EXTRAS) return;
-    alert("DEBUG stripTempExtras: builtComp=" + builtComp.name + " numLayers=" + builtComp.numLayers);
     builtComp.layer("Vertical Bar").remove();
-    alert("DEBUG stripTempExtras: Vertical Bar removed OK");
     builtComp.layer("Back Plate").remove();
-    alert("DEBUG stripTempExtras: Back Plate removed OK");
 }
 
 //Random RGB color (0-1 per channel), used instead of a fixed palette so each
