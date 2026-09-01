@@ -547,10 +547,6 @@ var barGroupLeftX = groupShift + (barSpacingStep*1 - curItem.width*.05);
 //Span from bar 1's left edge to the last bar's right edge.
 var barGroupSpan = barSpacingStep*(totalBars-1) + groupBarWidth;
 
-alert("DEBUG SPACING: totalBars=" + totalBars + " compW=" + curItem.width + " detVar=" + detVar);
-alert("DEBUG SPACING: groupBarWidth=" + groupBarWidth + " groupShift=" + groupShift);
-alert("DEBUG SPACING: barSpacingStep=" + barSpacingStep + " barGroupLeftX=" + barGroupLeftX + " barGroupSpan=" + barGroupSpan);
-
 //Create the Vertical Bar
 var vBarThickness = Math.round(detVar*.02);
 var vBarLength = detVar;
@@ -822,18 +818,6 @@ if (labelCheck == false) {
         var precompFinalAmount = 7+(totalBars*2);
     }
 }
-
-var dbgHBar = curItem.layer("Horizontal Bar");
-var dbgBar1 = curItem.layer("Bar 1");
-var dbgBarN = curItem.layer("Bar " + totalBars);
-var dbgMC = curItem.layer("MASTER CONTROL");
-var dbgHBarPos = dbgHBar.position.value;
-var dbgHBarAnchor = dbgHBar.anchorPoint.value;
-var dbgBar1Pos = dbgBar1.position.value;
-var dbgBarNPos = dbgBarN.position.value;
-var dbgMCScale = dbgMC.scale.value;
-alert("DEBUG PRE-PC: HBar pos.x=" + dbgHBarPos[0] + " anchor.x=" + dbgHBarAnchor[0] + " parent=" + (dbgHBar.parent ? dbgHBar.parent.name : "null"));
-alert("DEBUG PRE-PC: Bar1 pos.x=" + dbgBar1Pos[0] + " BarN pos.x=" + dbgBarNPos[0] + " MC scale.x=" + dbgMCScale[0]);
 
 for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
