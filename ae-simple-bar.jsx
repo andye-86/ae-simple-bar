@@ -597,8 +597,15 @@ for(x = 1; x <= totalBars; x++) {
 var centerYone = curItem.layer(1).position.value[1];
 var centerYtwo = curItem.layer(2).position.value[1];
 
-curItem.layer(1).position.setValue([(curItem.width*.0712)*(7-totalBars),centerYone]);
-curItem.layer(2).position.setValue([(curItem.width*.0712)*(7-totalBars),centerYtwo]);
+//Exact centering shift (replaces the old approximate curItem.width*.0712*
+//(7-totalBars) constant, which didn't actually center the bar group -
+//solved so that bar 1 and the last bar land symmetrically around comp
+//center, for any totalBars/width/bar width).
+var groupBarWidth = Math.round(detVar*.16);
+var groupShift = (1.1*curItem.width - groupBarWidth - curItem.width*(.126+.0014*totalBars)*(totalBars+1)) / 2;
+
+curItem.layer(1).position.setValue([groupShift,centerYone]);
+curItem.layer(2).position.setValue([groupShift,centerYtwo]);
 
 for(x = 1; x <= totalBars; x++) {
      curItem.layer((x*3)+2).parent = curItem.layer((totalBars*3)+3);   
@@ -613,7 +620,7 @@ curItem.layers.addSolid([0,0,0],"Back Plate", Math.round((totalBars/7) * curItem
 curItem.selectedLayers[0].label = 9;
 curItem.selectedLayers[0].opacity.setValue([15]);
 curItem.selectedLayers[0].anchorPoint.setValue([0,detVar]);
-curItem.selectedLayers[0].position.setValue([(curItem.width*.0712)*(7-totalBars),centerYone]);
+curItem.selectedLayers[0].position.setValue([groupShift,centerYone]);
 curItem.selectedLayers[0].scale.setValue([100,99]);
 
 //Parent to Master Null
@@ -787,21 +794,6 @@ if (labelCheck == false) {
 for (var i = 1; i <= precompFinalAmount; i++) {
    precomposeArray.push(i);
    }
-
-var dbgMC = curItem.layer("MASTER CONTROL");
-var dbgBar1 = curItem.layer("Bar 1");
-var dbgBarN = curItem.layer("Bar " + totalBars);
-var dbgVBar = curItem.layer("Vertical Bar");
-var dbgMCPos = dbgMC.position.value;
-var dbgMCScale = dbgMC.scale.value;
-var dbgBar1Pos = dbgBar1.position.value;
-var dbgBarNPos = dbgBarN.position.value;
-var dbgVBarPos = dbgVBar.position.value;
-alert("DEBUG X: totalBars=" + totalBars + " compW=" + curItem.width);
-alert("DEBUG X: MASTER CONTROL x=" + dbgMCPos[0] + " scaleX=" + dbgMCScale[0]);
-alert("DEBUG X: Bar 1 x=" + dbgBar1Pos[0]);
-alert("DEBUG X: Bar " + totalBars + " x=" + dbgBarNPos[0]);
-alert("DEBUG X: Vertical Bar x=" + dbgVBarPos[0]);
 
 curItem.layers.precompose(precomposeArray, "Horizontal Bar Graph", true);
 
