@@ -334,9 +334,11 @@ function secondUI(isVertical, totalBars, minVal, maxVal, barCheck, perCheck, axi
 function debugDumpLayer(label, lyr) {
     if (!lyr) { alert("DEBUG " + label + ": layer not found"); return; }
     var msg = "DEBUG " + label + ": name=" + lyr.name;
-    try { msg += " pos=" + lyr.position.value; } catch (e) { msg += " pos=ERR(" + e.toString() + ")"; }
-    try { msg += " anchor=" + lyr.anchorPoint.value; } catch (e) { msg += " anchor=ERR(" + e.toString() + ")"; }
-    try { msg += " scale=" + lyr.scale.value; } catch (e) { msg += " scale=ERR(" + e.toString() + ")"; }
+    // NOTE: "+ value" on a Position/Scale/AnchorPoint array throws ExtendScript's
+    // "invalid numeric result" bug - .value[0]/[1] (scalar) or .toString() avoids it.
+    try { var p = lyr.position.value; msg += " pos=(" + p[0] + "," + p[1] + ")"; } catch (e) { msg += " pos=ERR(" + e.toString() + ")"; }
+    try { var a = lyr.anchorPoint.value; msg += " anchor=(" + a[0] + "," + a[1] + ")"; } catch (e) { msg += " anchor=ERR(" + e.toString() + ")"; }
+    try { var s = lyr.scale.value; msg += " scale=(" + s[0] + "," + s[1] + ")"; } catch (e) { msg += " scale=ERR(" + e.toString() + ")"; }
     try { msg += " threeD=" + lyr.threeDLayer; } catch (e) { msg += " threeD=ERR(" + e.toString() + ")"; }
     try { msg += " parent=" + (lyr.parent ? lyr.parent.name : "null"); } catch (e) { msg += " parent=ERR(" + e.toString() + ")"; }
     alert(msg);
