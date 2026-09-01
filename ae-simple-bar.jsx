@@ -485,8 +485,10 @@ for (var x = 1; x <= totalBars; x++) {
     //BAR MAKER FUNCTION
     vBarMaker(x);
 
-    //Parenting
-    curItem.layer(1).parent = curItem.layer(2);
+    //Parenting - % parents directly to MASTER CONTROL (not Value) so its
+    //position expression's reference to Value's transform.position isn't
+    //double-applied through a parent chain.
+    curItem.layer(1).parent = curItem.layer((x*3)+1);
     curItem.layer(2).parent = curItem.layer((x*3)+1);
     curItem.layer(3).parent = curItem.layer((x*3)+1);
 
@@ -953,8 +955,10 @@ for (var x = 1; x <= totalBars; x++) {
     //BAR MAKER FUNCTION
     vBarMaker(x);
 
-    //Parenting
-    curItem.layer(1).parent = curItem.layer(2);
+    //Parenting - % parents directly to MASTER CONTROL (not Value) so its
+    //position expression's reference to Value's transform.position isn't
+    //double-applied through a parent chain.
+    curItem.layer(1).parent = curItem.layer((x*3)+1);
     curItem.layer(2).parent = curItem.layer((x*3)+1);
     curItem.layer(3).parent = curItem.layer((x*3)+1);
 
