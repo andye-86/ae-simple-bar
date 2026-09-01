@@ -495,8 +495,11 @@ for (var x = 1; x <= totalBars; x++) {
 
     //EXPRESSIONS
         
-    //% Expressions
-    curItem.layer(1).position.expression = "x = transform.position[0]; y = transform.position[1]; if (thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") < 9) { [x/1.65,y] } else { [x,y] }"    
+    //% Expressions - tracks the Value text's actual rendered bounds so the
+    //% sign's top lines up with the Value text's top, offset to its right.
+    //(thisLayer.index+1 is the Value text - it's always the layer directly
+    //above the % text in the stack.)
+    curItem.layer(1).position.expression = "var valLayer = thisComp.layer(thisLayer.index + 1); var valRect = valLayer.sourceRectAtTime(); var myRect = thisLayer.sourceRectAtTime(); var gap = thisComp.width*.005; var newX = (valLayer.transform.position[0] + valRect.left + valRect.width + gap) - myRect.left; var newY = (valLayer.transform.position[1] + valRect.top) - myRect.top; [newX, newY]"
    
     //Text Expression
     curItem.layer(2).property("Source Text").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\").value.toFixed(0)"
@@ -967,8 +970,11 @@ for (var x = 1; x <= totalBars; x++) {
     
     //EXPRESSIONS    
         
-    //% Expressions
-    curItem.layer(1).position.expression = "x = transform.position[0]; y = transform.position[1]; if (thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\") < 9.5) { [x/1.65,y] } else { [x,y] }"    
+    //% Expressions - tracks the Value text's actual rendered bounds so the
+    //% sign's top lines up with the Value text's top, offset to its right.
+    //(thisLayer.index+1 is the Value text - it's always the layer directly
+    //above the % text in the stack.)
+    curItem.layer(1).position.expression = "var valLayer = thisComp.layer(thisLayer.index + 1); var valRect = valLayer.sourceRectAtTime(); var myRect = thisLayer.sourceRectAtTime(); var gap = thisComp.width*.005; var newX = (valLayer.transform.position[0] + valRect.left + valRect.width + gap) - myRect.left; var newY = (valLayer.transform.position[1] + valRect.top) - myRect.top; [newX, newY]"
    
    //Text Expression
     curItem.layer(2).property("Source Text").expression = "thisComp.layer(\"MASTER CONTROL\").effect(\"Value Amount " + x + "\")(\"Slider\").value.toFixed(0)"
