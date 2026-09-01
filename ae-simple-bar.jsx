@@ -530,6 +530,23 @@ for (var x = 1; x <= totalBars; x++) {
 
 /////////CREATE BACKGROUND//////////
 
+//Exact centering shift (replaces the old approximate curItem.width*.0712*
+//(7-totalBars) constant, which didn't actually center the bar group -
+//solved so that bar 1 and the last bar land symmetrically around comp
+//center, for any totalBars/width/bar width). Computed here (before
+//Horizontal Bar is created) because its length depends on it below.
+var groupBarWidth = Math.round(detVar*.16);
+var groupShift = (1.1*curItem.width - groupBarWidth - curItem.width*(.126+.0014*totalBars)*(totalBars+1)) / 2;
+
+//Where bar 1's own left edge actually is (groupShift alone is just the
+//sequence's shift term - bar 1's position also adds its own per-bar
+//spacing term). Horizontal Bar/Back Plate need to start here, not at
+//groupShift alone, or they overhang past the first bar.
+var barSpacingStep = curItem.width*(.126+.0014*totalBars);
+var barGroupLeftX = groupShift + (barSpacingStep*1 - curItem.width*.05);
+//Span from bar 1's left edge to the last bar's right edge.
+var barGroupSpan = barSpacingStep*(totalBars-1) + groupBarWidth;
+
 //Create the Vertical Bar
 var vBarThickness = Math.round(detVar*.02);
 var vBarLength = detVar;
@@ -567,7 +584,7 @@ var curPositionY = curItem.selectedLayers[0].position.value[1];
 curItem.selectedLayers[0].position.setValue([0, baselineY]);
 
 //Create the Horizontal Bar
-var hBarLength = Math.round((totalBars/7) * curItem.width);
+var hBarLength = Math.round(barGroupSpan);
 var hBarThickness = Math.round(detVar*.02);
 createLineShape(curItem, "Horizontal Bar", [[0, hBarThickness / 2], [hBarLength, hBarThickness / 2]], hBarThickness);
 curItem.selectedLayers[0].label = 9;
@@ -608,15 +625,12 @@ for(x = 1; x <= totalBars; x++) {
 var centerYone = curItem.layer(1).position.value[1];
 var centerYtwo = curItem.layer(2).position.value[1];
 
-//Exact centering shift (replaces the old approximate curItem.width*.0712*
-//(7-totalBars) constant, which didn't actually center the bar group -
-//solved so that bar 1 and the last bar land symmetrically around comp
-//center, for any totalBars/width/bar width).
-var groupBarWidth = Math.round(detVar*.16);
-var groupShift = (1.1*curItem.width - groupBarWidth - curItem.width*(.126+.0014*totalBars)*(totalBars+1)) / 2;
-
+//Vertical Bar sits one bar-step before the group (an axis reference point,
+//not meant to align with the group's own left edge) so it keeps using
+//groupShift alone. Horizontal Bar needs to actually span the bar group,
+//so it uses barGroupLeftX (groupShift plus bar 1's own spacing term).
 curItem.layer(1).position.setValue([groupShift,centerYone]);
-curItem.layer(2).position.setValue([groupShift,centerYtwo]);
+curItem.layer(2).position.setValue([barGroupLeftX,centerYtwo]);
 
 for(x = 1; x <= totalBars; x++) {
      curItem.layer((x*3)+2).parent = curItem.layer((totalBars*3)+3);   
@@ -627,11 +641,11 @@ curItem.layer(1).parent = curItem.layer((totalBars*3)+3);
 curItem.layer(2).parent = curItem.layer((totalBars*3)+3);
 
 //Create Background
-curItem.layers.addSolid([0,0,0],"Back Plate", Math.round((totalBars/7) * curItem.width), detVar, pxlAsp);
+curItem.layers.addSolid([0,0,0],"Back Plate", Math.round(barGroupSpan), detVar, pxlAsp);
 curItem.selectedLayers[0].label = 9;
 curItem.selectedLayers[0].opacity.setValue([15]);
 curItem.selectedLayers[0].anchorPoint.setValue([0,detVar]);
-curItem.selectedLayers[0].position.setValue([groupShift,centerYone]);
+curItem.selectedLayers[0].position.setValue([barGroupLeftX,centerYone]);
 curItem.selectedLayers[0].scale.setValue([100,99]);
 
 //Parent to Master Null
