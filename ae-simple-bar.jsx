@@ -545,7 +545,10 @@ curItem.selectedLayers[0].position.setValue([curPositionX - moveX, curPositionY 
 var curPositionX = curItem.selectedLayers[0].position.value[0];
 var curPositionY = curItem.selectedLayers[0].position.value[1];
 
-curItem.selectedLayers[0].position.setValue([0, curPositionY]);
+//Y pinned to baselineY (not curPositionY, which is comp-center-derived) so
+//this line's bottom (its anchor) sits on the same baseline as the bars and
+//Horizontal Bar, instead of floating below it.
+curItem.selectedLayers[0].position.setValue([0, baselineY]);
 
 //Create the Horizontal Bar
 var hBarLength = Math.round((totalBars/7) * curItem.width);
@@ -838,7 +841,7 @@ function vBarMaker(spacingAmount) {
         centerDoc.fillColor = [1,1,1];
         centerDoc.justification = ParagraphJustification.CENTER_JUSTIFY;
         centerDoc.font = "Arial-BoldMT";
-        centerDoc.fontSize = detVar*.11296;
+        centerDoc.fontSize = detVar*.11296*0.6;
         centerNum.setValue(centerDoc);
 
         //Main Text Re-Position
@@ -855,7 +858,7 @@ function vBarMaker(spacingAmount) {
         perDoc.fillColor = [1,1,1];
         perDoc.justification = ParagraphJustification.CENTER_JUSTIFY;
         perDoc.font = "Arial-BoldMT";
-        perDoc.fontSize = detVar*.0540;
+        perDoc.fontSize = detVar*.0540*0.6;
         perNum.setValue(perDoc);
 
         //% Text Re-Position
@@ -1327,12 +1330,12 @@ function vBarMaker(spacingAmount) {
         curItem.layers.addText("Value");  
         
         if (totalBars <= 7) {
-            var mainTextSize=detVar*.11296;
-            var perTextSize=detVar*.0540;
+            var mainTextSize=detVar*.11296*0.6;
+            var perTextSize=detVar*.0540*0.6;
             var perMoveMod = .115;
             } else {
-            var mainTextSize=detVar*.08996;
-            var perTextSize=detVar*.0380;
+            var mainTextSize=detVar*.08996*0.6;
+            var perTextSize=detVar*.0380*0.6;
             var perMoveMod = .083;
             }
 
